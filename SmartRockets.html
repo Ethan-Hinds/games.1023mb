@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script> <!--p5-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+</body>
+
+<script>
+
+var cWidth;
+var cHeight;
+
+var lifeSpan = 150;
+var n = 200;
+var magnitude = 0.5;
+var mutationChance = 0.005;
+
+
+var count = 0;
+var target;
+var population;
+var boundaries = [];
+
+var generation = 1;
+
+function setup() {
+
+	cWidth = 700;
+	cHeight = 700;
+
+	target = {
+		x: cWidth/2,
+		y: 50
+	}
+
+	setCourse("face");
+
+	createCanvas(cWidth, cHeight);
+
+	$("body").append("<br><label> Course </label> <select id = 'courseSelect' onchange = 'changeCourse()'><option value = 'face'> Face </option> <option value = 'moving boxes'> Moving Boxes </option> <option value = 'line'> Line </option> </select>")
+
+	population = new Population();
+}
+
+function changeCourse() {
+	reset();
+}
+
+function reset() {
+	boundaries = [];
+	generation = 1;
+	setCourse($("#courseSelect").val());
+	population = new Population();
+	count = 0;
+}
+function draw() {
+	background(0);
+
+	fill(20, 0, 255);
+	textSize(20);
+	textAlign(LEFT, TOP);
+	text("Gen: " + generation, 10, 10);
+
+	fill(0, 255, 0);
+	ellipse(target.x, target.y, 15, 15);
+
+	fill(255);
+	for (let boundary of boundaries) {
+		boundary.show();
+	}
+
+	count += 1;
+	for (let rocket of population.rockets) {
+		rocket.show();
+		if (!rocket.crashed && !rocket.goal) {
+			rocket.applyForce(rocket.dna[count]);
+			rocket.update();
+		}
+	}
+
+	if (count == lifeSpan - 1) {
+		population.evaluate();
+		population.selection();
+		count = 0;
+		generation += 1;
+	}
+}
+
+function Population() {
+
+	this.matingPool = [];
+
+	this.rockets = [];
+	for (let i = 0; i < n; i += 1) {
+		this.rockets.push(new Rocket());
+	}
+
+	this.evaluate = function() {
+		this.matingPool = [];
+		var maxFit = 0;
+		for (let rocket of this.rockets) {
+			rocket.calcFitness();
+			if (rocket.fitness > maxFit) {
+				maxFit = rocket.fitness;
+			}
+		}
+
+		for (let rocket of this.rockets) {
+			rocket.fitness /= maxFit;
+			let n = rocket.fitness * 100;
+			for (let i = 0; i < n; i += 1) {
+				this.matingPool.push(rocket);
+			}
+		}
+	}
+
+	this.selection = function() {
+		for (let i = 0; i < this.rockets.length; i += 1) {
+			let p1 = random(this.matingPool);
+			let p2 = random(this.matingPool);
+			let childDna = p1.crossover(p2);
+			this.rockets[i] = new Rocket(childDna);
+		}
+	}
+}
+
+function Rocket(dna) {
+	this.width = 10;
+	this.height = 50;
+
+	this.position = {
+		x: cWidth/2,
+		y: cHeight - this.height
+	};
+	this.velocity = {
+		dx: 0,
+		dy: 0
+	}
+	this.dna;
+
+	this.goal = false;
+	this.crashed = false;
+
+	if (dna) {
+		this.dna = dna;
+	} else {
+		this.dna = [];
+		for (let i = 0; i < lifeSpan; i += 1) {
+			let dx = random(-1, 1);
+			let dy = random(-1, 1);
+
+			let m = sqrt(dx**2 + dy**2);
+			dx = dx/m * magnitude;
+			dy = dy/m * magnitude;
+			this.dna.push({dx: dx, dy: dy});
+		}
+	}
+
+	this.show = function() {
+		fill(255, 255, 255, 150);
+		push();
+		translate(this.position.x, this.position.y);
+		rotate(atan(-this.velocity.dx/this.velocity.dy));
+		rectMode(CENTER);
+		rect(0, 0, this.width, this.height);
+		pop();
+	}
+
+	this.applyForce = function(force) {
+		this.velocity.dx += force.dx;
+		this.velocity.dy += force.dy;
+	}
+
+	this.update = function() {
+
+		this.position.x += this.velocity.dx;
+		this.position.y += this.velocity.dy;
+
+		if (random() < mutationChance) {
+			this.mutate();
+		}
+
+		if (dist(this.position.x, this.position.y, target.x, target.y) < 10) {
+			this.goal = true;
+			this.position.x = target.x;
+			this.position.y = target.y;
+		}
+
+		if (this.didCrash()) {
+			this.crashed = true;
+		}
+	}
+
+	this.calcFitness = function() {
+		let d = dist(this.position.x, this.position.y, target.x, target.y);
+		this.fitness = map(d, 0, cWidth, cWidth, 0);
+		if (this.goal) {
+			this.fitness *= 10;
+		}
+		if (this.crashed) {
+			this.fitness /= 10;
+		}
+	}
+
+	this.crossover = function(partner) {
+		let newDna = [];
+		let mid = floor(random(0, this.dna.length));
+		for (let i = 0; i < this.dna.length; i += 1) {
+			if (i > mid) {
+				newDna[i] = this.dna[i];
+			} else {
+				newDna[i] = partner.dna[i];
+			}
+		}
+		return newDna;
+	}
+
+	this.mutate = function() {
+		let dx = random(-1, 1);
+		let dy = random(-1, 1);
+
+		let m = sqrt(dx**2 + dy**2);
+		dx = dx/m * magnitude;
+		dy = dy/m * magnitude;
+		this.dna[count] = {dx: dx, dy: dy};
+	}
+
+	this.didCrash = function() {
+
+		if (this.position.x < -50 || this.position.x > cWidth + 50 || this.position.y < -50 || this.position.y > cHeight + 50) {
+			return true;
+		}
+
+		for (let boundary of boundaries) {
+			if (this.position.x > boundary.x && this.position.x < boundary.x + boundary.width && this.position.y > boundary.y && this.position.y < boundary.y + boundary.height) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+}
+
+function setCourse(course) {
+	if (course == "face") {
+		lifeSpan = 300;
+		boundaries.push(new Boundary(100, cHeight/2 + 110, cWidth - 200, 20, 0));
+		boundaries.push(new Boundary(100, cHeight/2 + 10, 20, 100, 0));
+		boundaries.push(new Boundary(cWidth - 120, cHeight/2 + 10, 20, 100, 0));
+		boundaries.push(new Boundary(100, cHeight/2 - 200, 20, 100, 0));
+		boundaries.push(new Boundary(cWidth - 120, cHeight/2 - 200, 20, 100, 0));
+	} else if (course == "moving boxes") {
+		lifeSpan = 150;
+		boundaries.push(new Boundary("cWidth/2 - 300 + 1.5*count", "cHeight/2 - 300 + 1.5*count", 50, 50, 0));
+		boundaries.push(new Boundary("cWidth/2 - 200 + 1.5*count", "cHeight/2 - 200 + 1.5*count", 50, 50, 0));
+		boundaries.push(new Boundary("cWidth/2 - 100 + 1.5*count", "cHeight/2 - 100 + 1.5*count", 50, 50, 0));
+		boundaries.push(new Boundary("cWidth/2 + 1.5*count", "cHeight/2 + 1.5*count", 50, 50, 0));
+	} else if (course == "line") {
+		lifeSpan = 250;
+		boundaries.push(new Boundary(100, cHeight/2 - 10, cWidth - 200, 20, 0));
+	}
+}
+
+
+
+
+
+
+
+function Boundary(xEq, yEq, width, height, rotation) {
+	this.xEq = xEq;
+	this.yEq = yEq;
+	this.width = width;
+	this.height = height;
+	this.rotation = rotation;
+
+	this.x;
+	this.y;
+
+	this.show = function() {
+		this.x = eval(this.xEq);
+		this.y = eval(this.yEq);
+		rectMode(CORNER);
+		push();
+		translate(this.x, this.y);
+		rotate(this.rotation);
+		rect(0, 0, this.width, this.height);
+		pop();
+	}
+}
+
+</script>
+
+
+<style>
+
+</style>
+
+</html>
