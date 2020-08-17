@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "Assets"
+		},
+		{
+			"path": "Sounds"
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}
