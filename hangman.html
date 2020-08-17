@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script> 
+</head>
+
+<body>
+	<p id = "wordLengthText"> Word Length: </p>
+	<input type = "text" id = "wordLength">
+	<p id = "wordCheckText"> Word Check: </p>
+	<input type = "text" id = "wordCheck">
+	
+	<div class="dropdown">
+		<button onclick="showRules()" class="dropbtn">Instructions</button>
+  		<div id="myDropdown" class="dropdown-content">
+    		<p> Think of a word </p>
+    		<p> Insert the length of your word</p>
+    		<p> The computer's guess will show on the bottom </p>
+    		<p> Use the arrow keys to move your highlighter across the word </p>
+    		<p> Hit space to insert the guess in the correct spots </p>
+    		<p> To remove a letter you placed, highlight it, and hit space </p>
+    		<p> When you're done inserting letters, hit enter </p>
+    		<p> If the guessed letter is not in the word, just hit enter </p>
+    		<p> Once the game is over, insert a new word length to play again </p>
+    	</div>
+	</div>
+
+	<canvas> </canvas>
+<script>
+
+var canvas;
+var width;
+var height;
+var c;
+var wordLength;
+var counter;
+var unguessedLetters = [];
+var guess = "";
+var firstGuess;
+var knownLetters = [];
+var playerInput = 0;
+var numberOfLettersAdded = [];
+var numberOfIncorrectLetters = 0;
+var numberOfCorrectLetters = 0;
+var words = []
+
+$.ajax({
+    url : "https://raw.githubusercontent.com/dwyl/english-words/master/words.txt",
+    success : function(result){
+      	allWords = result.split("\n");
+        for (word in allWords) {
+        	allWords[word] = allWords[word].toLowerCase();
+        }
+        allWords.splice(0, 77);
+        allWords[0] = "a";
+        setUp();
+	}
+});
+
+function setUp() {
+
+	console.clear()
+
+	unguessedLetters = [];
+	knownLetters = [];
+	playerInput = 0;
+	numberOfLettersAdded = [];
+	numberOfIncorrectLetters = 0;
+	numberOfCorrectLetters = 0;
+	words = [];
+
+	canvas = document.querySelector("canvas");
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight - 50;
+	width = canvas.width;
+	height = canvas.height;
+
+	c = canvas.getContext("2d");
+	c.clearRect(0, 0, width, height);
+	c.beginPath();
+	c.moveTo(width / 2 - 100, height * 0.1);
+	c.lineTo(width / 2 - 100, 0);
+	c.lineTo(width / 2, 0);
+	c.lineTo(width / 2, height / 2);
+	c.lineTo(width / 2 - 100, height / 2);
+	c.stroke();
+	c.closePath();
+	c.beginPath();
+	c.moveTo(width / 2, height / 2);
+	c.lineTo(width / 2 + 100, height / 2);
+	c.stroke();
+	c.closePath();
+}
+
+function clearLetters() {
+	c.clearRect(0, height * 0.56, width, height * 0.03);
+}
+
+function highlight(number) {
+	c.fillStyle = "yellow";
+	c.globalAlpha = 0.5;
+	c.fillRect((width / 2 - 250)+ number * 30, height * 0.6 - 30, 20, 20);
+	c.globalAlpha = 1;
+}
+
+
+$(document).keydown(function() {
+	keyPressed = event.keyCode;
+	if (keyPressed == 39) {
+		if (counter < wordLength - 1) {
+			counter += 1;
+			clearLetters();
+			for (letter in knownLetters) {
+				c.font = "17px Times New Roman";
+				c.fillStyle = "black";
+				c.fillText(knownLetters[letter].toUpperCase(), (width / 2 - 242) + (letter)* 30, height * 0.58);
+			}
+			highlight(counter);
+		}
+	} else if (keyPressed == 37) {
+		if (counter > 0) {
+			counter -= 1;
+			clearLetters();
+			for (letter in knownLetters) {
+				c.font = "17px Times New Roman";
+				c.fillStyle = "black";
+				c.fillText(knownLetters[letter].toUpperCase(), (width / 2 - 242) + (letter)* 30, height * 0.58);
+			}
+			highlight(counter);
+		}	
+	} else if (keyPressed == 32) {
+		if (playerInput == 1) {
+			handleLetters();
+		}
+	} else if (keyPressed == 13) {
+		if (playerInput == 1) {
+			playerInput = 0;
+			if (numberOfLettersAdded == 0) {
+				incorrectLetter();
+			}
+			numberOfCorrectLetters += numberOfLettersAdded;
+			clearLetters();
+			for (letter in knownLetters) {
+				c.font = "17px Times New Roman";
+				c.fillStyle = "black";
+				c.fillText(knownLetters[letter].toUpperCase(), (width / 2 - 242) + (letter)* 30, height * 0.58);
+			}
+			narrowDown();
+		}
+	}
+});
+
+$("#wordCheck").change(function() {
+	if (allWords.includes($(this).val().toLowerCase())) {
+		alert ("Yes");
+		$("#wordLength").val($("#wordCheck").val().length)
+		$("#wordCheck").blur();
+		setUp();
+		begin();
+	} else {
+		alert ("No");
+	}
+})
+
+$("#wordLength").change(function() {
+	c.clearRect(0, height * 0.59, width, height * 0.59);
+	$("#wordLength").blur();
+	setUp();
+	begin();
+});
+
+function begin() {
+
+	clearLetters();
+	firstGuess = 1;
+	knownLetters = [];
+	numberOfIncorrectLetters = 0;
+	wordLength = $("#wordLength").val();
+	counter = 0;
+	while (counter < wordLength) {
+		c.beginPath();
+		c.moveTo((width / 2 - 250) + counter * 30, height * 0.6);
+		c.lineTo((width / 2 - 250) + counter * 30 + 20, height * 0.6);
+		c.stroke();
+		c.closePath();
+		knownLetters.push("");
+		counter += 1;
+	}
+
+	unguessedLetters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+
+	makeGuess();
+}
+
+function makeGuess() {
+
+	if (firstGuess == 1) {
+		firstGuess = 0;
+		var wordCounter = allWords.length - 1;
+		while (wordCounter >= 0) {
+			if (allWords[wordCounter].length == wordLength && allWords[wordCounter] != allWords[wordCounter + 1]) {
+				words.push(allWords[wordCounter])
+			}
+			wordCounter -= 1;
+		}
+	}
+
+	c.clearRect(width * 0.4, height * 0.65, width * 0.2, height * 0.06);
+
+	if (words.length == 1) {
+		guess = words[0]
+	} else if (numberOfCorrectLetters == wordLength) {
+		throw new Error("Stopping the function!");
+	} else if (numberOfCorrectLetters + 1 == wordLength) {
+		var unknownLetter = knownLetters.indexOf("")
+		guess = words[0][unknownLetter]
+	} else {
+		// if (unguessedLetters.includes("r") && words.length > 100) {
+		// 	guess = "r";
+		// } else if (unguessedLetters.includes("s") && words.length > 100) {
+		// 	guess = "s";
+		// } else if (unguessedLetters.includes("t") && words.length > 100) {
+		// 	guess = "t";
+		// } else if (unguessedLetters.includes("l") && words.length > 100) {
+		// 	guess = "l";
+		// } else if (unguessedLetters.includes("n") && words.length > 100) {
+		// 	guess = "n";
+		// } else if (unguessedLetters.includes("e") && words.length > 100) {
+		// 	guess = "e";
+		// } else {
+			var numberOfTimeLetterAppears = {"a": 0, "b": 0, "c": 0, "d": 0, "e": 0, "f": 0, "g": 0, "h": 0, "i": 0, "j": 0, "k": 0, "l": 0, "m": 0, "n": 0, "o": 0, "p": 0, "q": 0, "r": 0, "s": 0, "t": 0, "u": 0, "v": 0, "w": 0, "x": 0, "y": 0, "z": 0};
+			for (word in words) {
+				for (letter in words[word]) {
+					if (unguessedLetters.includes(words[word][letter])) {
+						numberOfTimeLetterAppears[words[word][letter]] += 1;
+					}
+				}
+			}
+			var highestFrequency = 0;
+			var highestFrequencyLetter;
+			for (letter in numberOfTimeLetterAppears) {
+				if (numberOfTimeLetterAppears[letter] > highestFrequency) {
+					highestFrequency = numberOfTimeLetterAppears[letter];
+					highestFrequencyLetter = letter;
+				}
+			}
+			guess = highestFrequencyLetter;
+		//}
+	}
+	console.log (words.length + " possible words");
+	if (words.length <= 20) {
+		console.log(words)
+	}
+	unguessedLetters.splice(unguessedLetters.indexOf(guess), 1);
+
+
+	c.font = "30px Times New Roman";
+	c.fillStyle = "black";
+	c.fillText(guess.toUpperCase(), width / 2, height * 0.7);
+	counter = 0;
+	playerInput = 1;
+	numberOfLettersAdded = 0;
+	highlight(counter);
+}
+
+function handleLetters() {
+	if (knownLetters[counter] == "") {
+		numberOfLettersAdded += 1;
+		knownLetters[counter] = guess;
+	} else if (knownLetters[counter] == guess) {
+		knownLetters[counter] = "";
+		numberOfLettersAdded -= 1;
+	}
+	clearLetters();
+	c.font = "17px Times New Roman";
+	c.fillStyle = "black";
+	for (letter in knownLetters) {
+		c.fillText(knownLetters[letter].toUpperCase(), (width / 2 - 242) + letter * 30, height * 0.58);
+	}
+	highlight(counter);
+
+}
+
+function incorrectLetter() {
+	numberOfIncorrectLetters += 1;
+	c.font = "17px Times New Roman";
+	c.fillStyle = "black";
+	c.fillText(guess.toUpperCase(), (width/2 + 50) + numberOfIncorrectLetters * 20, height * 0.05);
+	drawBody();
+
+}
+
+function narrowDown() {
+	var wordCounter = words.length - 1;
+	var toRemove = [];
+	while (wordCounter >= 0) {
+		for (letter in words[wordCounter]) {
+			if (!(words[wordCounter][letter] == knownLetters[letter]) && !(knownLetters[letter] == "")) {
+				toRemove.push(wordCounter);
+			} else if (words[wordCounter][letter] == guess && knownLetters[letter] != guess) {
+				toRemove.push(wordCounter);
+			}
+		}
+		wordCounter -= 1;
+	}
+
+	var toRemoveWithoutDuplicates = [];
+	for (item in toRemove) {
+		if (toRemove[item] != toRemove[item + 1]) {
+			toRemoveWithoutDuplicates.push(toRemove[item]);
+		}
+	}
+
+	var tempList = [];
+	for (word in words) {
+		if (!(toRemoveWithoutDuplicates.includes(parseInt(word)))) {
+			tempList.push(words[word]);
+		} 
+	}
+
+	words = [];
+	for (word in tempList) {
+		words.push(tempList[word]);
+	}
+
+	makeGuess();
+}
+
+function drawBody() {
+	switch (numberOfIncorrectLetters) {
+		case 1:
+			c.beginPath();
+			c.arc(width / 2 - 100, height * 0.15, height * 0.05, 0, 2*Math.PI);
+			c.stroke();
+			c.closePath();
+			break;
+		case 2:
+			c.beginPath();
+			c.moveTo(width / 2 - 100, height * 0.2)
+			c.lineTo(width / 2 - 100, height * 0.3)
+			c.stroke();
+			c.closePath();
+			break;
+		case 3:
+			c.beginPath();
+			c.moveTo(width / 2 - 100, height * 0.25)
+			c.lineTo(width / 2 - 150, height * 0.23)
+			c.stroke();
+			c.closePath();
+			break;
+		case 4:
+			c.beginPath();
+			c.moveTo(width / 2 - 100, height * 0.25)
+			c.lineTo(width / 2 - 50, height * 0.23)
+			c.stroke();
+			c.closePath();
+			break;
+		case 5:
+			c.beginPath();
+			c.moveTo(width / 2 - 100, height * 0.3)
+			c.lineTo(width / 2 - 150, height * 0.35)
+			c.stroke();
+			c.closePath();
+			break;
+		case 6:
+			c.beginPath();
+			c.moveTo(width / 2 - 100, height * 0.3)
+			c.lineTo(width / 2 - 50, height * 0.35)
+			c.stroke();
+			c.closePath();
+			break;
+	}
+}
+
+function showRules() {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+
+</script>
+
+<style>
+
+#wordLength {
+	display: inline-block;
+}
+
+#wordLengthText {
+	display: inline-block;
+}
+
+#wordCheckText {
+	display: inline-block;
+}
+
+#wordCheck {
+	display: inline-block;
+}
+
+body {
+	margin: 0;
+}
+
+canvas {
+	display: block;
+}
+
+.dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+    background-color: #3e8e41;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    left: 50%;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content p {
+    color: black;
+    padding: 5px 12px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown a:hover {background-color: #f1f1f1}
+
+.show {display:block;}
+
+</style>
+
+</body>
+</html>
