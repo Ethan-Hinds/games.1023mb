@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script> <!--p5-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+<canvas> </canvas>
+
+<div style="display:none;">
+
+  <img id="club" src="https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/Card_club.svg/977px-Card_club.svg.png"
+       width="30" height="30">
+
+  <img id="spade" src="https://upload.wikimedia.org/wikipedia/en/thumb/b/b8/Card_spade.svg/784px-Card_spade.svg.png"
+       width="30" height="30">
+
+  <img id="heart" src="https://upload.wikimedia.org/wikipedia/en/thumb/0/0b/Card_heart.svg/866px-Card_heart.svg.png"
+       width="30" height="30">
+
+   <img id="diamond" src="https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/Card_diamond.svg/743px-Card_diamond.svg.png"
+       width="30" height="30">
+
+
+</div>
+
+</body>
+
+<script>
+
+var cards = [];
+
+var names = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+var values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+var suits = ["clubs", "hearts", "spades", "diamonds"];
+
+var rows = [];
+
+var remainingHidden = [];
+var remainingShown = [];
+
+var moving = false;
+
+var clickingAreas = [];
+
+var cardsHighlighted = false;
+
+var movingCard;
+
+var trains = [];
+
+var boxes = [[], [], [], [] ];
+
+function setup() {
+
+	canvas = document.querySelector("canvas");
+	c = canvas.getContext("2d");
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight - 50;
+	width = canvas.width;
+	height = canvas.height;
+
+	canvas.addEventListener("mousedown", getPosition, false);
+
+	for (i = 0; i < 13; i += 1) {
+		for (j = 0; j < 4; j += 1) {
+			card = new Card(names[i], values[i], suits[j]);
+			cards.push(card);
+		}
+	}
+
+	shuffleArray(cards);
+
+	var beginIndex = 0;
+	var endIndex = 1;
+
+	for (i = 0; i < 7; i += 1) {
+		rows.push(cards.slice(beginIndex, endIndex));
+		var difference = endIndex - beginIndex;
+		beginIndex = endIndex;
+		endIndex = beginIndex + difference + 1;
+	}
+
+	for (i in rows) {
+		rows[i][rows[i].length - 1].faceUp = true;
+	}
+
+	remainingHidden = cards.slice(beginIndex);
+
+	for (i = 0; i < rows.length; i += 1) {
+		for (j = 0; j < rows[i].length; j += 1) {
+			rows[i][j].x = (80 * i) + 50 + 3*j;
+			rows[i][j].y = (j * 40) + 150;
+			rows[i][j].row = i;
+		}
+	}
+
+	drawBoxes();
+
+	drawRemainingCards();
+
+	//c.fillRect(0, 0, width, height);
+
+}
+
+function Card(name, value, suit) {	
+	this.name = name;
+	this.value = value;
+	this.suit = suit;
+	this.x = 0;
+	this.y = 0;
+	this.width = 60;
+	this.height = 100;
+	this.faceUp = false;
+	this.highlighted = false;
+	this.row;
+
+	if (this.suit == "clubs" || this.suit == "spades") {
+		this.color = "black";
+	} else {
+		this.color = "red";
+	}
+}
+
+function draw() {
+
+	c.clearRect(0, 0, width, height);
+
+	for (i in rows) {
+		c.strokeStyle = "black";
+		c.strokeRect((80 * i) + 50, 150, 60, 100);
+		for (j in rows[i]) {
+			drawCard(rows[i][j]);
+		}
+	}
+
+	for (i in remainingHidden) {
+		drawCard(remainingHidden[i]);
+	}
+
+	for (i in remainingShown) {
+		drawCard(remainingShown[i]);
+	}
+
+	for (i in boxes) {
+		for (j in boxes[i]) {
+			drawCard(boxes[i][j]);
+		}
+	}
+
+	drawBoxes();
+
+
+}
+
+function drawRemainingCards() {
+
+	for (i in remainingHidden) {
+		remainingHidden[i].x = 50 + 1 * i;
+		remainingHidden[i]. y = 25;
+		remainingHidden[i].faceUp = false;
+		remainingHidden[i].row = 7;
+	}
+}
+
+function drawBoxes() {
+
+	for (i = 0; i < 4; i += 1) {
+		c.strokeStyle = "black";
+		c.strokeRect(490 - (80 * i), 25, 60, 100);
+	}
+
+}
+
+function drawCard(card) {
+	c.strokeStyle = "black";
+	c.beginPath();
+
+	if (card.faceUp) {
+		if (card.highlighted) {
+			c.fillStyle = "yellow";
+		} else {
+			c.fillStyle = "white"
+		}
+		c.fillRect(card.x, card.y, card.width, card.height);
+		c.strokeRect(card.x, card.y, card.width, card.height);
+		c.closePath();
+
+		c.font = "30px Times New Roman";
+		c.textAlign = "center";
+		if (card.suit == "clubs" || card.suit == "spades") {
+			c.fillStyle = "black";
+		} else {
+			c.fillStyle = "red";
+		}
+
+		c.fillText(card.name, card.x + card.width * 0.5, card.y + card.height * 0.4);
+
+		var img;
+
+		if (card.suit == "clubs") {
+			img = document.getElementById("club");
+		} else if (card.suit == "spades") {
+			img = document.getElementById("spade");
+		} else if (card.suit == "hearts") {
+			img = document.getElementById("heart");
+		} else if (card.suit == "diamonds") {
+			img = document.getElementById("diamond");
+		}
+
+		c.drawImage(img, card.x + card.width * 0.5 - 15, card.y + card.height * 0.55, 30, 30);
+	} else {
+		c.fillStyle = "red";
+		c.fillRect(card.x, card.y, card.width, card.height);
+		c.strokeRect(card.x, card.y, card.width, card.height);
+		c.closePath();
+	}
+}
+
+function moveCard(card, x, y) {
+	moving = true;
+	var dx = parseInt(x - card.x) * 2 / 25;
+	var dy = parseInt(y - card.y) * 2 / 25;
+
+	if (Math.abs(card.x - x) > 3 || Math.abs(card.y - y > 3)) {
+		card.x += dx;
+		card.y += dy;
+		setTimeout(function() {moveCard(card, x, y)}, 10);
+	} else {
+		card.x = x;
+		card.y = y;
+		moving = false;
+	}
+
+}
+
+function toggleHighlight() {
+	if (!cardsHighlighted) {
+
+		movingCard.highlighted = true;
+
+		cardsHighlighted = true;
+
+	} else {
+		for (i in rows) {
+			for (j in rows[i]) {
+				rows[i][j].highlighted = false;
+			}
+		}
+
+		for (i in boxes) {
+			for (j in boxes[i]) {
+				boxes[i][j].highlighted = false;
+			}
+		}
+
+		for (i in remainingShown) {
+			remainingShown[i].highlighted = false;
+		}
+
+		cardsHighlighted = false;
+	}
+}
+
+function remainingHiddenPileClicked() {
+	if (remainingHidden.length > 0) {
+		var clickedCard = remainingHidden[remainingHidden.length - 1];
+		clickedCard.faceUp = true;
+		clickedCard.row = 8;
+		remainingHidden.splice(remainingHidden.length - 1, 1);
+		remainingShown.push(clickedCard);
+		moveCard(clickedCard, clickedCard.x + 80, clickedCard.y);
+	} else if (!moving) {
+		for (i = remainingShown.length - 1; i >= 0; i -= 1) {
+			remainingHidden.push(remainingShown[i]);
+		}
+		drawRemainingCards();
+		remainingShown = [];
+	}
+}
+
+function remainingShownPileClicked() {
+	if (remainingShown.length > 0) {
+		if (!cardsHighlighted) {
+			movingCard = remainingShown[remainingShown.length - 1];
+		} else {
+			movingCard = null;
+		}
+		toggleHighlight();
+	}
+}
+
+function cardClicked(x, y) {
+	for (i in cards) {
+		var card = cards[i];
+		if (x > card.x && x < card.x + card.width && y > card.y && y < card.y + card.height) {
+			if (card.row >= 0 && card.row <= 6) {
+				if (card.faceUp) {
+					return card;
+				}
+			} else {
+				return card;
+			}
+		}
+	}
+}
+
+function rowClicked(clickedRow, cardThatWasClicked) {
+
+	// If this is the case, the player wants to move a card to this row
+
+	if (cardsHighlighted) {
+
+		if (movingCard.color != cardThatWasClicked.color && cardThatWasClicked.value - 1 == movingCard.value && movingCard.row != clickedRow) {
+
+			if (movingCard.row >= 0 && movingCard.row <= 6) {
+
+				for (i in trains) {
+					if (trains[i][0] == movingCard) {
+
+						var movingCardIndex = rows[movingCard.row].indexOf(movingCard);
+
+						if (movingCardIndex > 0) {
+							rows[movingCard.row][movingCardIndex - 1].faceUp = true;
+						}
+
+						rows[clickedRow] = rows[clickedRow].concat(trains[i]);
+						rows[movingCard.row].splice(movingCardIndex);
+
+						for (j in trains[i]) {
+							moveCard(trains[i][j], (3 * j) + cardThatWasClicked.x + 3, (40 * j) + cardThatWasClicked.y + 40);
+							trains[i][j].row = clickedRow;
+
+						}
+					}
+				}
+			} else {
+				if (movingCard.row == 8) {
+					rows[clickedRow].push(movingCard);
+					remainingShown.splice(remainingShown.length - 1);
+					moveCard(movingCard, cardThatWasClicked.x + 3, cardThatWasClicked.y + 40);
+					movingCard.row = clickedRow;
+				}
+			}
+
+		}
+
+		toggleHighlight();
+	// If this is the case, the player wants to move a card from this row
+	} else {
+		movingCard = cardThatWasClicked;
+		toggleHighlight();
+	}
+}
+
+function boxClicked(box) {
+	if (cardsHighlighted) {
+
+		if (movingCard.row > 6 || rows[movingCard.row].indexOf(movingCard) == rows[movingCard.row].length - 1) {	
+
+			if (boxes[box].length > 0) {
+
+				if (movingCard.value - 1 == boxes[box][boxes[box].length - 1].value && movingCard.suit == boxes[box][boxes[box].length - 1].suit) {
+
+					boxes[box].push(movingCard);
+
+					if (movingCard.row <= 6) {
+						var movingCardIndex = rows[movingCard.row].indexOf(movingCard);
+						if (movingCardIndex > 0) {
+							rows[movingCard.row][movingCardIndex - 1].faceUp = true;
+						}
+						rows[movingCard.row].splice(movingCardIndex);
+					} else {
+						remainingShown.splice(remainingShown.length - 1);
+					}
+
+					moveCard(movingCard, 250 + (80 * box), 25);
+					movingCard.row = 9 + box;
+
+				}
+
+			} else if (movingCard.value == 1) {
+				boxes[box].push(movingCard);
+
+				if (movingCard.row <= 6) {
+					var movingCardIndex = rows[movingCard.row].indexOf(movingCard);
+					if (movingCardIndex > 0) {
+						rows[movingCard.row][movingCardIndex - 1].faceUp = true;
+					}
+					rows[movingCard.row].splice(movingCardIndex);
+				} else {
+					remainingShown.splice(remainingShown.length - 1);
+				}
+
+				moveCard(movingCard, 250 + (80 * box), 25);
+				movingCard.row = 9 + box;
+			}
+		}
+		toggleHighlight();
+	} else {
+
+	}
+}
+
+function emptyRowClicked(row) {
+
+	if (cardsHighlighted) {
+		if (movingCard.value == 13 && rows[row].length == 0) {
+			
+			if (movingCard.row >= 0 && movingCard.row <= 6) {
+
+				for (i in trains) {
+					if (trains[i][0] == movingCard) {
+
+						var movingCardIndex = rows[movingCard.row].indexOf(movingCard);
+
+						if (movingCardIndex > 0) {
+							rows[movingCard.row][movingCardIndex - 1].faceUp = true;
+						}
+
+						rows[row] = rows[row].concat(trains[i]);
+						rows[movingCard.row].splice(movingCardIndex);
+
+						for (j in trains[i]) {
+							moveCard(trains[i][j], (3 * j) + (80 * row) + 50, (40 * j) + 150);
+							trains[i][j].row = row;
+
+						}
+					}
+				}
+			} else {
+				if (movingCard.row == 8) {
+					rows[row].push(movingCard);
+					remainingShown.splice(remainingShown.length - 1);
+					moveCard(movingCard, row * 80 + 50, 150);
+					movingCard.row = row;
+				}
+			}
+
+		}
+	}
+
+	toggleHighlight();
+
+}
+
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
+function getPosition(event) {
+	var x = event.offsetX;
+ 	var y = event.offsetY;
+
+ 	//console.log("x: " + x + " y: " + y);
+
+	//calculateClickingAreas();
+
+ 	// remaining pile clicked
+
+	trains = [];
+
+	for (i in rows) {
+  		for (j in rows[i]) {
+  			var card = rows[i][j];
+  			if (card.faceUp) {
+  				var temp = [];
+  				var faceUp = rows[i].slice(j);
+
+  				trains.push(faceUp);
+  			}
+  		}
+  	}
+
+  	var card = cardClicked(x, y);
+
+  	if (!(card == undefined)) {
+  		if (card.row >= 0 && card.row <= 6 && card.faceUp) {
+  			rowClicked(card.row, card)
+  		} else if (card.row == 7) {
+  			remainingHiddenPileClicked();
+  		} else if (card.row == 8) {
+  			remainingShownPileClicked();
+  		} else if (card.row >= 9 && card.row <= 12) {
+  			boxClicked(card.row - 9);
+  		}
+  	} else if (x > 50 && x < 130 && y > 32 && y < 132) {
+  		remainingHiddenPileClicked();
+  	} else if (y > 25 && y < 125) {
+  		if (x > 250 && x < 310) {
+  			boxClicked(0);
+  		} else if (x > 330 && x < 390) {
+  			boxClicked(1);
+  		} else if (x > 410 && x < 470) {
+  			boxClicked(2);
+  		} else if (x > 490 && x < 550) {
+  			boxClicked(3);
+  		}
+  	} else if (y > 150 && y < 250) {
+  		if (x > 50 && x < 110) {
+  			emptyRowClicked(0);
+  		} else if (x > 130 && x < 190) {
+  			emptyRowClicked(1);
+  		} else if (x > 210 && x < 270) {
+  			emptyRowClicked(2);
+  		} else if (x > 290 && x < 350) {
+  			emptyRowClicked(3);
+  		} else if (x > 370 && x < 430) {
+  			emptyRowClicked(4);
+  		} else if (x > 450 && x < 510) {
+  			emptyRowClicked(5);
+  		} else if (x > 530 && x < 590) {
+  			emptyRowClicked(6);
+  		}
+  	}
+
+}
+
+
+
+</script>
+
+
+<style>
+
+</style>
+
+</html>
