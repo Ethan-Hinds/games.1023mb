@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.min.js"></script> <!--p5-->
+</head>
+
+<body>
+</body>
+
+<script>
+
+
+var cWidth;
+var cHeight;
+
+var leftPaddle;
+var rightPaddle;
+
+var ball;
+
+var minDx = 8;
+var minDy = 3;
+var maxDx = 10;
+var maxDy = 8;
+
+var ballRadius = 10;
+
+var paddleSpeed = 12;
+
+var leftPaddleHit = false;
+
+var leftPaddleOffset = 0;
+
+function setup() {
+
+	cWidth = 800;
+	cHeight = 500;
+
+	createCanvas(cWidth, cHeight);
+	resetGame();
+
+}
+
+function draw() {
+
+		background(0);
+		leftPaddle.show();
+		rightPaddle.show();
+		ball.show();
+
+	ball.move();
+	ball.collisionCheck();
+
+	if (!leftPaddleHit) {
+		if (ball.dx < 0) {
+			rightPaddle.goal = ball.y;
+		} else {
+			getEstimate();
+		}
+	}
+
+	if (keyIsDown(UP_ARROW)) {
+		if (leftPaddle.y > 0) {
+			leftPaddle.y -= paddleSpeed;
+		}
+	}
+	if (keyIsDown(DOWN_ARROW)) {
+		if (leftPaddle.y < cHeight - leftPaddle.height) {
+			leftPaddle.y += paddleSpeed;
+		}
+	}
+
+	rightPaddle.moveToGoal();
+
+	if (ball.x < 0 || ball.x > width) {
+		resetGame();
+	}
+}
+
+function resetGame() {
+	leftPaddleHit = false;
+	leftPaddle = new Paddle(10, cHeight/2 - 50, 10, 100);
+	rightPaddle = new Paddle(cWidth - 20, cHeight/2 - 50, 10, 100);
+	let dx = random(minDx, maxDx);
+	let negativeDx = floor(random(0, 2));
+	let dy = random(minDy, maxDy);
+	let negativeDy = floor(random(0, 2));
+
+	if (negativeDx == 1) {
+		dx *= -1;
+	}
+	if (negativeDy == 1) {
+		dy *= -1;
+	}
+
+	ball = new Ball(cWidth/2, cHeight/2, ballRadius, dx, dy);
+}
+
+
+function Paddle(x, y, width, height) {
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+
+	this.goal = cHeight/2 - this.height/2;
+
+	this.show = function() {
+		rect(this.x, this.y, this.width, this.height);
+	}
+
+	this.moveToGoal = function() {
+		if (abs(this.y + this.height/2- this.goal) > paddleSpeed) {
+			if (this.y + this.height/2 < this.goal && this.y + this.height < cHeight) {
+				this.y += paddleSpeed;
+			} else if (this.y + this.height/2 > this.goal && this.y > 0) {
+				this.y -= paddleSpeed;
+			}
+		}
+	}
+}
+
+function Ball(x, y, radius, dx, dy) {
+	this.x = x;
+	this.y = y;
+	this.radius = radius;
+	this.dx = dx;
+	this.dy = dy;
+
+	this.justBounced = false;
+
+	this.show = function() {
+		ellipse(this.x, this.y, this.radius*2);
+	}
+
+	this.move = function() {
+		this.x += this.dx;
+		this.y += this.dy;
+	}
+
+	this.collisionCheck = function() {
+		if (this.y <= this.radius || cHeight - this.y <= this.radius) {
+			this.dy *= -1;
+		}
+			
+		if (this.x + this.radius > leftPaddle.x && this.x - this.radius < leftPaddle.x + leftPaddle.width && this.y + this.radius > leftPaddle.y && this.y - this.radius < leftPaddle.y + leftPaddle.height) {
+			this.dx *= -1;
+			let diff = this.y - (leftPaddle.y + leftPaddle.height/2);
+			let percentage = diff/leftPaddle.height;
+			this.dy += percentage*10;
+			bouncedOffLeftPaddle();
+		}
+
+		if (this.x + this.radius > rightPaddle.x && this.x - this.radius < rightPaddle.x + rightPaddle.width && this.y + this.radius > rightPaddle.y && this.y - this.radius < rightPaddle.y + rightPaddle.height) {
+			this.dx *= -1;
+			let diff = this.y - (rightPaddle.y + rightPaddle.height/2);
+			let percentage = diff/rightPaddle.height;
+			this.dy += percentage*10;
+			bouncedOffRightPaddle();
+		}
+	}
+}
+
+function bouncedOffLeftPaddle() {
+	getEstimate();
+}
+
+function bouncedOffRightPaddle() {
+	rightPaddle.goal = cHeight/2;
+	let rand = getRandomInt(0, 3);
+	switch (rand) {
+		case 0: leftPaddleOffset = -leftPaddle.height/2*0.9; break;
+		case 1: leftPaddleOffset = 0; break;
+		case 2: leftPaddleOffset = leftPaddle.height/2*0.9; break;
+	}
+}
+
+function getEstimate() {
+	leftPaddleHit = true;
+	let endY = ball.y + ball.dy/ball.dx * (rightPaddle.x - ball.x);
+	let bouncedY = abs(endY%cHeight);
+	if (abs(parseInt(endY/cHeight)%2) == 1) {
+		bouncedY = abs(cHeight - bouncedY);
+	} else {
+		bouncedY = abs(bouncedY);
+	}
+	rightPaddle.goal = bouncedY;
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+
+</script>
+
+
+<style>
+
+</style>
+
+</html>
