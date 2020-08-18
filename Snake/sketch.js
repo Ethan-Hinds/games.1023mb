@@ -122,13 +122,6 @@ function squareType(row, col) {
     }
     return "blank";
 }
-$(document).keydown(function() {
-    if (keyCode == LEFT_ARROW) {
-    } else if (keyCode == RIGHT_ARROW) {
-    } else if (keyCode == UP_ARROW) {
-    } else if (keyCode == DOWN_ARROW) {
-    }
-});
 function callUpdate() {
     callUpdateTimer = setInterval(function(){ update(); }, gameSpeed);
 }
