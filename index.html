@@ -1,18 +1,111 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Games</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script><!--p5--><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-</head>
-<body>
-<p><a href="TumblingToddlers/index.html">Tumbling Toddlers</a></p>
-<p><a href="Asteroids/index.html">Asteroids</a> </p>
-<p><a href="CPUTetris/index.html">Tetris</a> </p>
-<p><a href="Minesweeper_Solver/index.html">Minesweeper</a> </p>
-<p><a href="Hangman/index.html">Hangman</a> </p>
-<p><a href="Solitaire/index.html">Solitaire</a> </p>
-<p><a href="Smart_Rockets/index.html">Smart Rockets</a> </p>
-<p><a href="Mastermind/index.html">Mastermind</a> </p>
-<p><a href="Othello/index.html">Othello</a> </p>
-</body>
+  <head>
+    <title>Games</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script>
+    <!--p5-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <!-- <p><a href="Hangman/index.html">Hangman</a></p>
+    <p><a href="Solitaire/index.html">Solitaire</a></p>
+    <p><a href="Smart_Rockets/index.html">Smart Rockets</a></p>
+    <p><a href="Mastermind/index.html">Mastermind</a></p>
+    <p><a href="Othello/index.html">Othello</a></p> -->
+
+    <a href="TumblingToddlers/">
+      <div class="iconDiv">
+        <img class="iconImg" src="/Tumbling_Toddlers_Icon.png" />
+        <p>Tumbling Toddlers</p>
+      </div>
+    </a>
+
+    <a href="Asteroids/">
+      <div class="iconDiv">
+        <img class="iconImg" src="/Asteroids_Icon.png" />
+        <p>Asteroids</p>
+      </div>
+    </a>
+
+    <a href="CPUTetris/">
+      <div class="iconDiv">
+        <img class="iconImg" src="/Tetris_Icon.png" />
+        <p>Tetris</p>
+      </div>
+    </a>
+
+    <a href="Minesweeper_Solver/">
+      <div class="iconDiv">
+        <img class="iconImg" src="/Minesweeper_Icon.png" />
+        <p>Minesweeper</p>
+      </div>
+    </a>
+
+    <a href="Hangman/">
+      <div class="iconDiv">
+        <img class="iconImg" src="/Hangman_Icon.png" />
+        <p>Hangman</p>
+      </div>
+    </a>
+
+    <a href="Solitaire/">
+      <div class="iconDiv">
+        <img class="iconImg" src="/Solitaire_Icon.png" />
+        <p>Solitaire</p>
+      </div>
+    </a>
+
+    <br />
+    <a href="Smart_Rockets/">
+      <div class="iconDiv">
+        <img class="iconImg" src="/Smart_Rockets_Icon.png" />
+        <p>Smart Rockets</p>
+      </div>
+    </a>
+
+    <a href="Mastermind/">
+      <div class="iconDiv">
+        <img class="iconImg" src="/Mastermind_Icon.png" />
+        <p>Mastermind</p>
+      </div>
+    </a>
+
+    <a href="Othello/">
+      <div class="iconDiv">
+        <img class="iconImg" src="/Othello_Icon.png" />
+        <p>Othello</p>
+      </div>
+    </a>
+  </body>
 </html>
+
+<style>
+  body {
+    background-color: #030327;
+  }
+  .iconImg {
+    width: 120px;
+    border-radius: 50%;
+  }
+  p {
+    color: #dddddd;
+  }
+  .iconDiv {
+    width: 150px;
+    height: 160px;
+    display: inline-block;
+    text-align: center;
+    padding-top: 5px;
+  }
+  .iconDiv:hover {
+    background-color: #052549;
+  }
+  .iconDiv:hover > p {
+    color: white;
+  }
+
+  a {
+    text-decoration: none;
+  }
+</style>
