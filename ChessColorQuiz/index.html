@@ -1,0 +1,104 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/p5@0.7.2/lib/p5.min.js"></script>
+	</head>
+
+	<body>
+		<p> A square will appear on the screen. Press left arrow for white, and right arrow for black. </p>
+		<p> Get as many correct in 30 seconds as possible! </p>
+		<button onclick = 'start()'> Start </button>
+		<br>
+		<br>
+	</body>
+
+	<script>
+
+		var startTime;
+		var isTiming = false;
+		var squares = [];
+		var score = 0;
+
+		var displayingSquare;
+
+		function setup() {
+			createCanvas(500, 500);
+			for (let r = 0; r < 8; r += 1) {
+				for (let c = 0; c < 8; c += 1) {
+					squares.push(new Square(r, c));
+				}
+			}
+		}
+		
+		function start() {
+			isTiming = true;
+			startTime = new Date();
+			score = 0;
+
+			setTimeout(function() {
+				isTiming = false;
+			}, 30000);
+			showRandomSquare();
+		}
+
+		function showRandomSquare() {
+			displayingSquare = random(squares);
+		}
+
+		function draw() {
+			background("#555555");
+			if (isTiming) {	
+
+				textAlign(CENTER, CENTER);
+				textSize(50);
+				fill("#f0f080");
+				text(displayingSquare.displayName, 250, 200);
+				fill(255);
+				text("White", 100, 300);
+				fill(0);
+				text("Black", 400, 300);
+				fill(0);
+
+				let timeDiff = new Date() - startTime;
+				timeDiff /= 1000;
+				let seconds = Math.round(timeDiff);
+			}
+			textAlign(LEFT, BOTTOM);
+			textSize(25);
+			text(`Score: ${score}`, 10, 490	);
+		}
+
+		function keyPressed() {
+			if (isTiming) {
+				if (keyCode == LEFT_ARROW) {
+					if (displayingSquare.color == "White") {
+						score += 1;
+					} else {
+						score -= 1;
+					}
+				} else if (keyCode == RIGHT_ARROW) {
+					if (displayingSquare.color == "Black") {
+						score += 1;
+					} else {
+						score -= 1;
+					}
+				}
+				if (keyCode == LEFT_ARROW || keyCode == RIGHT_ARROW) {
+					showRandomSquare();
+				}
+			}
+
+		}
+
+		class Square {
+			constructor(row, col) {
+				this.row = row;
+				this.col = col;
+				this.color = this.row%2 == this.col%2 ? "Black" : "White";
+				this.displayName = `${["a", "b", "c", "d", "e", "f", "g", "h"][this.col]}${this.row+1}`;
+			}
+		}
+
+	</script>
+</html>
