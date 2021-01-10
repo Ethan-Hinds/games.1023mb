@@ -42,7 +42,10 @@ function mousePressed() {
                         } else if (board.selectedPiece.possibleMoves.indexOf(square) >= 0) {
                             if (square === board.whiteKing.kingCastleSquare) {
                                 board.whiteKing.moveToSquare(board.grid[7][6]);
-                                board.isCastling = true;;
+                                board.isCastling = "king";
+                            } else if (square === board.whiteKing.queenCastleSquare) {
+                                    board.whiteKing.moveToSquare(board.grid[7][2]);
+                                    board.isCastling = "queen";
                             } else {
                                 board.selectedPiece.moveToSquare(square);
                             }

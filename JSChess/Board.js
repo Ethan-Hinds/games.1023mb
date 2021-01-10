@@ -84,12 +84,15 @@ class Board {
     }
 
     isCheck() {
+        let result = [];
         // returns "white" if white is in check, and "black" if black is in check
         for (let piece of this.pieces) {
             if (piece.color == "black") {
                 for (let square of piece.possibleMoves) {
-                    if (square === this.whiteKing.square) {
-                        return "white";
+                    if (!this.whiteKing) {
+                        result.push("white");
+                    } else if (square === this.whiteKing.square) {
+                        result.push("white");
                     }
                 }
             }
@@ -98,13 +101,15 @@ class Board {
         for (let piece of this.pieces) {
             if (piece.color == "white") {
                 for (let square of piece.possibleMoves) {
-                    if (square === this.blackKing.square) {
-                        return "black";
+                    if (!this.blackKing) {
+                        result.push("black");
+                    } else if (square === this.blackKing.square) {
+                        result.push("black");
                     }
                 }
             }
         }
-        return false;
+        return result;
     }
 
     addStartingPieces() {
@@ -239,7 +244,7 @@ class Board {
                 }
             }
             if (isMate) {
-                if (this.isCheck() == "white") {
+                if (this.isCheck().includes("white")) {
                     return "white";
                 } else {
                     return "stalemate";
@@ -256,8 +261,7 @@ class Board {
                 }
             }
             if (isMate) {
-                if (this.isCheck() == "black") {
-                    print ("returning black")
+                if (this.isCheck().includes("black")) {
                     return "black";
                 } else {
                     return "stalemate";
@@ -285,6 +289,7 @@ class Board {
                     // Check each possible move against white's best move in that position
                     let bestResponse = newBoard.getBestMove("white");
                     bestResponse[0].moveToSquare(bestResponse[1]);
+                    newBoard.setPossibleMoves();
                     let score = newBoard.evaluate();
                     if (score < bestScore) {
                         bestScore = score;

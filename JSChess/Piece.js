@@ -17,12 +17,12 @@ class Piece {
             let newSquare = newBoard.grid[square.row][square.col];
             // These go together
             newBoard.grid[this.square.row][this.square.col].piece.moveToSquare(newSquare);
-            if (newBoard.parent.isOriginal) {
+            if (newBoard.parent.isOriginal || newBoard.parent.parent.isOriginal) {
                 newBoard.setPossibleMoves();
             }
             //
             let result = newBoard.isCheck();
-            if (result && result == this.color) {
+            if (result.includes(this.color)) {
                 this.possibleMoves.splice(this.possibleMoves.indexOf(square), 1);
             }
         }
@@ -66,26 +66,33 @@ class Piece {
             this.board.pieces.splice(this.board.pieces.indexOf(this), 1);
             this.board.pieces.push(newQueen);
         }
-        board.setPossibleMoves();
-        let mateResult = this.board.checkForMate();
-        if (mateResult == "white") {
-            alert ("Black wins!");
-            return;
-        } else if (mateResult == "black") {
-            alert ("White wins!");
-            return;
-        } else if (mateResult == "stalemate") {
-            alert ("Stalemate!");
-            return;
-        }
-        if (!this.board.isCastling && this.board.turn == "black") {
-            this.board.computerMove();
-        }
-        if (this.board.isCastling) {
-            this.board.isCastling = false;
-            this.board.grid[7][7].piece.moveToSquare(this.board.grid[7][5]);
-            this.board.turn = this.board.turn == "white" ? "black" : "white";
-        }
+        let delay = this.board.turn == "black" ? 100 : 0;
+        setTimeout(function() {
+            board.setPossibleMoves();
+            let mateResult = this.board.checkForMate();
+            if (mateResult == "white") {
+                alert ("Black wins!");
+                return;
+            } else if (mateResult == "black") {
+                alert ("White wins!");
+                return;
+            } else if (mateResult == "stalemate") {
+                alert ("Stalemate!");
+                return;
+            }
+            if (!this.board.isCastling && this.board.turn == "black") {
+                this.board.computerMove();
+            }
+            if (this.board.isCastling == "king") {
+                this.board.isCastling = false;
+                this.board.grid[7][7].piece.moveToSquare(this.board.grid[7][5]);
+                this.board.turn = this.board.turn == "white" ? "black" : "white";
+            } else if (this.board.isCastling == "queen") {
+                this.board.isCastling = false;
+                this.board.grid[7][0].piece.moveToSquare(this.board.grid[7][3]);
+                this.board.turn = this.board.turn == "white" ? "black" : "white";
+            }
+        }, delay)
     }
 
     updateXY(dx, dy) {
