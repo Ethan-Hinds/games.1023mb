@@ -33,7 +33,7 @@ function draw() {
 	cycle.show();
 
 	fill("blue");
-	ellipse(cycle.x - cycle.dx*d, cycle.y - cycle.dy*d, 20, 20);
+	ellipse(cycle.x - cycle.dx*d, cycle.y - cycle.dy*d, 10, 10);
 }
 
 
@@ -45,7 +45,7 @@ function Cycle(x, y) {
 
 	this.show = function() {
 		fill("red");	
-		ellipse(this.x, this.y, 10, 10);
+		ellipse(this.x, this.y, 20, 20);
 		stroke("blue");	
 		line(this.x + this.dx*10, this.y + this.dy*10, this.x +  this.dx*50, this.y + this.dy*50)
 	}
