@@ -15,6 +15,7 @@ var cWidth = 500;
 var cHeight = 500;
 
 var d = 70;
+var speed = 6;
 
 var cycle;
 
@@ -30,6 +31,8 @@ function draw() {
 	let hyp = sqrt(cycle.dx**2 + cycle.dy**2);
 	cycle.dx /= hyp;
 	cycle.dy /= hyp;
+	cycle.x += cycle.dx*speed;
+	cycle.y += cycle.dy*speed;
 	cycle.show();
 
 	fill("blue");
