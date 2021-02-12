@@ -50,21 +50,24 @@ function mouseMoved() {
 	let x = (-dy/dx*player.x  +player.y - ai.y - ai.x*dx/dy) / (-dx/dy - dy/dx);
 	let y = dy/dx*(x-player.x) + player.y;
 
-	let sideDist = sqrt((ai.x - crossPoint.x)**2 + (ai.y - crossPoint.y)**2);
-	let backDist = sqrt((player.x - crossPoint.x)**2 + (player.y - crossPoint.y)**2);
+	let sideDist = sqrt((ai.x - x)**2 + (ai.y - y)**2);
+	let backDist = sqrt((player.x - x)**2 + (player.y - y)**2);
 
 
 	crossPoint = {x: x, y: y};
 	let leftOrRight;
+	
+	print ("Side: " + sideDist);
+	print ("Back: " + backDist);
 
 
-	if (abs(ai.x + ai.dx - player.x) < abs(ai.x - player.x)) {
-		leftOrRight = "right";
-	} else {
-		leftOrRight = "left";
-	}
+// 	if (abs(ai.x + ai.dx - player.x) < abs(ai.x - player.x)) {
+// 		leftOrRight = "right";
+// 	} else {
+// 		leftOrRight = "left";
+// 	}
 
-	print (leftOrRight);
+// 	print (leftOrRight);
 
 
 }
