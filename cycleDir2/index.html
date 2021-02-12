@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script> <!--p5-->
+</head>
+
+<body>
+
+</body>
+
+<script>
+
+var cWidth = 500;
+var cHeight = 500;
+
+var ai;
+var player;
+
+var crossPoint = {x: 0, y: 0}
+
+function setup() {
+	createCanvas(cWidth, cHeight);
+	ai = new AI();
+	player = new Player();
+
+}
+
+function draw() {
+	background(0);
+	ai.setDirections();
+	ai.show();
+	player.show();
+
+	fill("green");
+	ellipse(crossPoint.x, crossPoint.y, 10, 10);
+	stroke("yellow");
+	line(ai.x, ai.y, crossPoint.x, crossPoint.y);
+	line(player.x, player.y, crossPoint.x, crossPoint.y);
+
+
+}
+
+function mousePressed() {
+
+	let dy = ai.dy;
+	let dx = ai.dx;
+
+	let x = (-dy/dx*player.x  +player.y - ai.y - ai.x*dx/dy) / (-dx/dy - dy/dx);
+	let y = dy/dx*(x-player.x) + player.y;
+
+	let sideDist = sqrt((ai.x - crossPoint.x)**2 + (ai.y - crossPoint.y)**2);
+	let backDist = sqrt((player.x - crossPoint.x)**2 + (player.y - crossPoint.y)**2);
+
+
+	crossPoint = {x: x, y: y};
+	let leftOrRight;
+
+
+	if (abs(ai.x + ai.dx - player.x) < abs(ai.x - player.x)) {
+		leftOrRight = "right";
+	} else {
+		leftOrRight = "left";
+	}
+
+	print (leftOrRight);
+
+
+}
+
+
+function AI() {
+	this.x = cWidth/2
+	this.y = cHeight/2;
+	this.dx;
+	this.dy;
+
+	this.setDirections = function() {
+		this.dx = mouseX - this.x;
+		this.dy = mouseY - this.y;
+		let hyp = sqrt(this.dx**2 + this.dy**2);
+		this.dx /= hyp;
+		this.dy /= hyp;
+	}
+
+	this.show = function() {
+		fill("red");
+		noStroke();
+		ellipse(this.x, this.y, 20, 20);
+		stroke("blue");	
+		line(this.x + this.dx*10, this.y + this.dy*10, this.x +  this.dx*50, this.y + this.dy*50)
+	}
+}
+
+function Player() {
+	this.x = 400;
+	this.y = 300;
+
+	this.show = function() {
+		fill("blue");
+		noStroke();
+		ellipse(this.x, this.y, 20, 20);
+
+	}
+}
+
+
+
+</script>
+
+
+<style>
+
+</style>
+
+</html>
