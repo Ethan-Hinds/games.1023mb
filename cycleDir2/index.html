@@ -7,6 +7,7 @@
 </head>
 
 <body>
+<p> (Blue line is AI velocity direction) </p> <br>
 <p id = 'sideDist'> </p>
 <br>
 <p id = 'backDist'> </p>
@@ -74,9 +75,9 @@ function mousePressed() {
 
 	// if (rightX, rightY) is closer to the player than the AI is, the player is to the right
 	if (sqrt((rightX - player.x)**2 + (rightY - player.y)**2) < sqrt((ai.x - player.x)**2 + (ai.y-player.y)**2)) {
-		leftOrRight = "right";
+		leftOrRight = "right of";
 	} else {
-		leftOrRight = "left";
+		leftOrRight = "left of";
 	}
 
 	// Same thing for back
@@ -84,17 +85,17 @@ function mousePressed() {
 	let backY = ai.y - ai.dy;
 
 	if (sqrt((backX - player.x)**2 + (backY - player.y)**2) < sqrt((ai.x - player.x)**2 + (ai.y-player.y)**2)) {
-		frontOrBack = "back";
+		frontOrBack = "behind";
 	} else {
-		frontOrBack = "front";
+		frontOrBack = "in front of";
 	}
 
 	console.clear();
 	print (leftOrRight + ": " + sideDist);
 	print (frontOrBack + ": " + backDist);
 
-	document.getElementById("sideDist").innerHTML = (leftOrRight + ": " + sideDist);
-	document.getElementById("backDist").innerHTML = (frontOrBack + ": " + backDist);
+	document.getElementById("sideDist").innerHTML = ("Player is " + sideDist.toFixed(2) + " " + leftOrRight + " AI");
+	document.getElementById("backDist").innerHTML = ("Player is " + backDist.toFixed(2) + " " + frontOrBack + " AI");
 
 
 
@@ -121,7 +122,8 @@ function AI() {
 		noStroke();
 		ellipse(this.x, this.y, 20, 20);
 		stroke("blue");	
-		line(this.x + this.dx*10, this.y + this.dy*10, this.x +  this.dx*50, this.y + this.dy*50)
+		line(this.x + this.dx*10, this.y + this.dy*10, this.x +  this.dx*50, this.y + this.dy*50);
+		text("AI", this.x, this.y - 15);
 	}
 }
 
@@ -130,6 +132,7 @@ function Player() {
 	this.y = 350;
 
 	this.show = function() {
+		text("Player", this.x + 15, this.y);
 		fill("blue");
 		noStroke();
 		ellipse(this.x, this.y, 20, 20);
