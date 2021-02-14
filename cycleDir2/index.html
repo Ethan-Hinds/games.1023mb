@@ -7,6 +7,10 @@
 </head>
 
 <body>
+<p id = 'sideDist'> </p>
+<br>
+<p id = 'backDist'> </p>
+<br>
 
 </body>
 
@@ -18,7 +22,7 @@ var cHeight = 500;
 var ai;
 var player;
 
-var crossPoint = {x: 0, y: 0}
+var crossPoint = {x: 300, y: 250}
 
 function setup() {
 	createCanvas(cWidth, cHeight);
@@ -42,32 +46,57 @@ function draw() {
 
 }
 
-function mouseMoved() {
+// All the math happens in here!
+function mousePressed() {
 
 	let dy = ai.dy;
 	let dx = ai.dx;
 
-	let x = (-dy/dx*player.x  +player.y - ai.y - ai.x*dx/dy) / (-dx/dy - dy/dx);
+	// x and y are used to calculate the "crosspoint"
+	let x = (-dy/dx*player.x + player.y - ai.y - ai.x*dx/dy) / (-dx/dy - dy/dx);
 	let y = dy/dx*(x-player.x) + player.y;
 
-	let sideDist = sqrt((ai.x - x)**2 + (ai.y - y)**2);
-	let backDist = sqrt((player.x - x)**2 + (player.y - y)**2);
+	// These are the distances we're interested in.  sideDist and backDist
+	let sideDist = sqrt((ai.x - crossPoint.x)**2 + (ai.y - crossPoint.y)**2);
+	let backDist = sqrt((player.x - crossPoint.x)**2 + (player.y - crossPoint.y)**2);
 
-
+	// This is just for animation purposes
 	crossPoint = {x: x, y: y};
-	let leftOrRight;
 	
-	print ("Side: " + sideDist);
-	print ("Back: " + backDist);
+
+	// sideDist and backDist are just distances.  Now we need to see which direction the player is
+	let leftOrRight;
+	let frontOrBack;
+
+	// rightX and rightY represent a point slightly to the right of the circle
+	let rightX = (ai.x - ai.dy*10);
+	let rightY = (ai.y + ai.dx*10);
+
+	// if (rightX, rightY) is closer to the player than the AI is, the player is to the right
+	if (sqrt((rightX - player.x)**2 + (rightY - player.y)**2) < sqrt((ai.x - player.x)**2 + (ai.y-player.y)**2)) {
+		leftOrRight = "right";
+	} else {
+		leftOrRight = "left";
+	}
+
+	// Same thing for back
+	let backX = ai.x - ai.dx;
+	let backY = ai.y - ai.dy;
+
+	if (sqrt((backX - player.x)**2 + (backY - player.y)**2) < sqrt((ai.x - player.x)**2 + (ai.y-player.y)**2)) {
+		frontOrBack = "back";
+	} else {
+		frontOrBack = "front";
+	}
+
+	console.clear();
+	print (leftOrRight + ": " + sideDist);
+	print (frontOrBack + ": " + backDist);
+
+	document.getElementById("sideDist").innerHTML = (leftOrRight + ": " + sideDist);
+	document.getElementById("backDist").innerHTML = (frontOrBack + ": " + backDist);
 
 
-// 	if (abs(ai.x + ai.dx - player.x) < abs(ai.x - player.x)) {
-// 		leftOrRight = "right";
-// 	} else {
-// 		leftOrRight = "left";
-// 	}
-
-// 	print (leftOrRight);
 
 
 }
@@ -115,6 +144,9 @@ function Player() {
 
 <style>
 
+p {
+	display: inline-block;
+}
 </style>
 
 </html>
