@@ -105,6 +105,19 @@ function mouseDragged() {
     }
 }
 
+function mousePressed() {
+	if (mode == 0) {
+        for (let r = 0; r < squares.length; r += 1) {
+            for (let c = 0; c < squares[r].length; c += 1) {
+                let square = squares[r][c];
+                if (square.isInBounds(mouseX, mouseY) && !square.isWalkable) {
+                    squares[r][c].setWalkable();
+                }
+            }
+        }
+    }
+}
+
 function evaluate() {
     let minSquare = openSquares[0];
     let minScore = openSquares[0].fScore;
