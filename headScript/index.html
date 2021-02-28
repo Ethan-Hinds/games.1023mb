@@ -24,6 +24,8 @@
         let onLine = 0;
         let loopInfo = undefined;
 
+        document.getElementById("input").value = "x := 9\ny := 10\nif (x + 2) > y\nprint(x)\n  while(x<20)\n    x := x*2\n  end\n  print(x+2)\nend";
+
         function compile() {
 
             variables = {};
