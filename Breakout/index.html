@@ -1,0 +1,24 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script src="https://cdn.jsdelivr.net/npm/p5@0.7.2/lib/p5.min.js"></script>
+        <script language="javascript" type="text/javascript" src="sketch.js"></script>
+        <script language="javascript" type="text/javascript" src="Paddle.js"></script>
+        <script language="javascript" type="text/javascript" src="Ball.js"></script>
+        <script language="javascript" type="text/javascript" src="Brick.js"></script>
+		<script language="javascript" type="text/javascript" src="PaddleCode.js"></script>
+	</head>
+
+	<body>
+		<div id = "gameMode"> 
+			<p> In this game, you get to code the logic for the paddle! </p>
+			<button onclick = "openEditorMode()">Open Paddle Code Editor</button>
+			<button onclick = "startGame()">Start Game</button>
+		</div>
+		<div id = "editorMode" style = "display: none;">
+			<textarea id = "input" rows = "50" cols = "80" spellcheck = "false"></textarea>
+			<br>
+			<button onclick = "openGameMode()">Ok</button>
+		</div>
+	</body>
+</html>
