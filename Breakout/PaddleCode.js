@@ -92,7 +92,9 @@ class PaddleCode {
             } else if (operator == ",") {
                 return this.evaluateCondition(left).toString().concat(this.evaluateCondition(right));
             } else if (operator == "==") {
-                return this.evaluateCondition(left) == this.evaluateCondition(right);
+                let leftEval = this.evaluateCondition(left);
+                let rightEval = this.evaluateCondition(right);
+                return this.evaluateCondition(left).toString() == this.evaluateCondition(right).toString();
             }
         } else {
             let level = 0;
@@ -141,6 +143,7 @@ class PaddleCode {
             let opIndex = line.indexOf("=")
             let left = line.slice(0, opIndex);
             let right = line.slice(opIndex + "=".length);
+
             this.variables[left] = this.evaluateCondition(right).toString();
         }
     }
