@@ -16,7 +16,7 @@ function setup() {
     paddle = new Paddle(cWidth/2 - 125/2, cHeight * 0.9, 125, 15, 8);
     ball = new Ball(cWidth/2, cHeight/2, -2, 10, 10);
 
-    document.getElementById("input").value = "// The code you write here will be executed every frame\n\n// You may create variables of your own, but some given variables are:  \n\n// paddle.x:      The position of the left of the paddle\n// paddle.y:      The y position of the paddle\n// paddle.width:  The width of the paddle\n// ball.x:        The x position of the ball\n// ball.y:        The y position of the ball\n// ball.dx:       The horizontal component of the ball's velocity\n// ball.dy:       The vertical component of the ball's velocity.\n// width:         The width of the canvas\n// height:        The height of the canvas\n\n// Note: (0, 0) is at the top left of the canvas\n\n// The allowed statements are setting variables and if statements\n// Allowed operators are: && || + - * / ^ <=, >=, >, <, ==\n\n// Set the paddle.x variable to change the paddle's position in game\n\n// Some sample code is below\n\n\n\n\n// Define a variable for the paddle speed\npaddleSpeed = 30\n\nif ball.dx < 0\n  paddle.x = paddle.x - paddleSpeed\nend\n\nif ball.dx >= 0\n  paddle.x = paddle.x + paddleSpeed\nend\n\n\n// Boundary Conditions\n\nif paddle.x <= 0\n  paddle.x = 0\nend\n\nif (paddle.x + paddle.width) >= width\n  paddle.x = width - paddle.width\nend"
+    document.getElementById("input").value = "// The code you write here will be executed every frame\n\n// You may create variables of your own, but some given variables are:  \n\n// paddle.x:      The position of the left of the paddle\n// paddle.y:      The y position of the paddle\n// paddle.width:  The width of the paddle\n// ball.x:        The x position of the ball\n// ball.y:        The y position of the ball\n// ball.dx:       The horizontal component of the ball's velocity\n// ball.dy:       The vertical component of the ball's velocity.\n// width:         The width of the canvas\n// height:        The height of the canvas\n\n// Note: (0, 0) is at the top left of the canvas\n\n// The allowed statements are setting variables and if statements\n// Allowed operators are: && || + - * / ^ <=, >=, >, <, ==\n\n// Set the paddle.x variable to change the paddle's position in game\n\n// Some sample code is below\n\n\n\n\n//Is the ball moving left or right?\nisMovingLeft = ball.dx < 0\n\nif isMovingLeft\n  paddle.x = ball.x - paddle.width*1/10\nend\n\nif isMovingLeft == false\n  paddle.x = ball.x - paddle.width*9/10\nend\n\n\n// Boundary Conditions\n\nif paddle.x <= 0\n  paddle.x = 0\nend\n\nif (paddle.x + paddle.width) >= width\n  paddle.x = width - paddle.width\nend"
 
     setLevel();
 }
@@ -25,12 +25,12 @@ function draw() {
     background(0);
 
     if (mode == 2) {
-//         if (keyIsDown(LEFT_ARROW) && paddle.x > 0) {
-//             paddle.x -= paddle.speed;
-//         }
-//         if (keyIsDown(RIGHT_ARROW) && paddle.x < cWidth - paddle.width) {
-//             paddle.x += paddle.speed;
-//         }
+        if (keyIsDown(LEFT_ARROW) && paddle.x > 0) {
+            paddle.x -= paddle.speed;
+        }
+        if (keyIsDown(RIGHT_ARROW) && paddle.x < cWidth - paddle.width) {
+            paddle.x += paddle.speed;
+        }
 
         paddleCode.runCode({
             "paddle.x": paddle.x,
@@ -43,6 +43,8 @@ function draw() {
             "width": cWidth,
             "height": cHeight
         });
+
+
         paddle.show();
 
         ball.move();
