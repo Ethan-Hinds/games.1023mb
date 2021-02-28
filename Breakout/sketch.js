@@ -25,12 +25,12 @@ function draw() {
     background(0);
 
     if (mode == 2) {
-        if (keyIsDown(LEFT_ARROW) && paddle.x > 0) {
-            paddle.x -= paddle.speed;
-        }
-        if (keyIsDown(RIGHT_ARROW) && paddle.x < cWidth - paddle.width) {
-            paddle.x += paddle.speed;
-        }
+//         if (keyIsDown(LEFT_ARROW) && paddle.x > 0) {
+//             paddle.x -= paddle.speed;
+//         }
+//         if (keyIsDown(RIGHT_ARROW) && paddle.x < cWidth - paddle.width) {
+//             paddle.x += paddle.speed;
+//         }
 
         paddleCode.runCode({
             "paddle.x": paddle.x,
