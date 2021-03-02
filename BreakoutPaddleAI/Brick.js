@@ -17,7 +17,8 @@ class Brick {
         this.y += this.fallSpeed;
 
         if (this.y > paddle.y) {
-            bricks.splice(bricks.indexOf(this), 1)
+            bricks.splice(bricks.indexOf(this), 1);
+            lives -= 1;
         }
     }
 }
