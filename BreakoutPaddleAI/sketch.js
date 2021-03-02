@@ -15,7 +15,7 @@ function setup() {
     ball = new Ball(cWidth/2, cHeight/2, 0, 8, 10);
 
     createRandomBrick();
-    setInterval(createRandomBrick, 3000);
+    setInterval(createRandomBrick, 2500);
 }
 
 function draw() {
@@ -62,8 +62,17 @@ function doAI() {
         return;
     }
 
-
     let brick = bricks[0];
+    let minDist = sqrt((brick.x - goalX)**2 + (brick.y - paddle.y)**2);
+    for (let _brick of bricks) {
+        _brick.fillColor = "red";
+        let dist = sqrt((_brick.x - goalX)**2 + (_brick.y - paddle.y)**2);
+        if (dist < minDist) {
+            minDist = dist;
+            brick = _brick;
+        }
+    }
+    brick.fillColor = "#00ff00";
 
     let xDist;
     if (goalX > brick.x) {
@@ -71,21 +80,21 @@ function doAI() {
     } else {
         xDist = brick.x + brick.width/2 - goalX + paddle.width/2;
     }
-    let time = sqrt(xDist**2 + (brick.y - paddle.y)**2) / sqrt(ball.dx**2 + ball.dy**2);
-    let yDist = brick.y - paddle.y - ball.radius - brick.height/2 + brick.fallSpeed*time*0.5;
+    //let time = sqrt(xDist**2 + (brick.y - paddle.y)**2) / sqrt(ball.dx**2 + ball.dy**2);
+    let time = 0;
+    let yDist = brick.y - paddle.y + brick.fallSpeed*time*0.25;
     let neededDx = xDist/yDist * abs(ball.dy);
     let neededDiff = neededDx * paddle.width / 10;
 
-    if (abs(neededDiff) > paddle.width/2) {
+    if (abs(neededDiff) > paddle.width*0.5) {
+        brick.fillColor = "yellow";
         //neededDiff /= 4;
         //neededDiff = constrain(neededDiff, -paddle.width/2, paddle.width/2);
-        print ("Banking");
         time = sqrt(xDist**2 + (cHeight + brick.y)**2) / sqrt(ball.dx**2 + ball.dy**2);
         yDist = -(cHeight + brick.y) - brick.fallSpeed*time;
         neededDx = xDist/yDist * abs(ball.dy)
         neededDiff = neededDx * paddle.width / 10;
-        if (abs(neededDiff) > paddle.width/2) {
-            print ("Unbankable!");
+        if (abs(neededDiff) > paddle.width*0.5) {
             neededDiff = constrain(neededDiff, -paddle.width/2, paddle.width/2);
         }
 
