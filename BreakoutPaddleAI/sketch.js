@@ -86,7 +86,7 @@ function doAI() {
     let neededDx = xDist/yDist * abs(ball.dy);
     let neededDiff = neededDx * paddle.width / 10;
 
-    if (abs(neededDiff) > paddle.width*0.5) {
+    if (abs(neededDiff) > paddle.width*0.85) {
         brick.fillColor = "yellow";
         //neededDiff /= 4;
         //neededDiff = constrain(neededDiff, -paddle.width/2, paddle.width/2);
@@ -94,7 +94,7 @@ function doAI() {
         yDist = -(cHeight + brick.y) - brick.fallSpeed*time;
         neededDx = xDist/yDist * abs(ball.dy)
         neededDiff = neededDx * paddle.width / 10;
-        if (abs(neededDiff) > paddle.width*0.5) {
+        if (abs(neededDiff) > paddle.width*0.85) {
             neededDiff = constrain(neededDiff, -paddle.width/2, paddle.width/2);
         }
 
