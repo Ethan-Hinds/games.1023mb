@@ -5,10 +5,11 @@ class Brick {
         this.width = width;
         this.height = height;
         this.fallSpeed = fallSpeed;
+        this.fillColor = "red";
     }
 
     show() {
-        fill("red");
+        fill(this.fillColor);
         rect(this.x, this.y, this.width, this.height);
     }
 
