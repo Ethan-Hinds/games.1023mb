@@ -2,7 +2,8 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script> <!--p5-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 </head>
 
 <body>
@@ -25,14 +26,21 @@ function setup() {
 	let minuteHand = new Hand("green", 125, 60);
 	let secondHand = new Hand("yellow", 135, 60);
 
+	let millisecondHand = new Hand("pink", 135, 1000);
+
 	let hands = {
 		hourHand: hourHand,
 		minuteHand: minuteHand,
-		secondHand: secondHand
+		secondHand: secondHand,
+		millisecondHand: millisecondHand
 	}
 
 	clock = new Clock(cWidth/2, cHeight/2, 150, hands);
 
+	let input = document.createElement("input");
+
+	$("body").append("<br><input type = 'checkbox' id = 'showMilliseconds'/> <label for = 'showMilliseconds'>Show Milliseconds</label>");
+	$("body").append("<br><input type = 'checkbox' id = 'smoothHands'/> <label for = 'smoothHands'>Smooth Hands</label>")
 }
 
 function draw() {
@@ -50,6 +58,10 @@ class Clock {
 		this.centerY = centerY;
 		this.radius = radius;
 		this.hands = hands;
+
+		for (let hand in this.hands) {
+			this.hands[hand].clock = this;
+		}
 	}
 
 	update() {
@@ -57,13 +69,18 @@ class Clock {
 		let hours = today.getHours();
 		let minutes = today.getMinutes();
 		let seconds = today.getSeconds();
+		let milliseconds = today.getMilliseconds();
 
-		minutes += (seconds/60);
-		hours += (minutes/60);
+		if ($("#smoothHands").is(":checked")) {
+			seconds += (milliseconds/1000);
+			minutes += (seconds/60);
+			hours += (minutes/60);
+		}
 
 		this.hands.hourHand.value = hours;
 		this.hands.minuteHand.value = minutes;
 		this.hands.secondHand.value = seconds;
+		this.hands.millisecondHand.value = milliseconds;
 	}
 
 	show() {
@@ -83,24 +100,27 @@ class Clock {
 		}
 
 		for (let hand in this.hands) {
-			this.hands[hand].show();
+			if (hand != "millisecondHand" || $("#showMilliseconds").is(":checked")) {
+				this.hands[hand].show();
+			}
 		}
 	}
 }
 
 class Hand {
-	constructor(color, length, maxValue) {
+	constructor(color, length, maxValue, clock) {
 		this.color = color;
 		this.length = length;
 		this.value;
 		this.maxValue = maxValue;
+		this.clock = clock;
 	}
 
 	show() {
 		let angle = this.value / this.maxValue * TWO_PI - HALF_PI;
 		stroke(this.color);
 		strokeWeight(5);
-		line(cWidth/2, cHeight/2, cWidth/2 + this.length*cos(angle), cHeight/2 + this.length*sin(angle));
+		line(this.clock.centerX, this.clock.centerY, this.clock.centerX + this.length*cos(angle), this.clock.centerY + this.length*sin(angle));
 	}
 }
 
