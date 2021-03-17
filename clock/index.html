@@ -15,9 +15,7 @@ var cHeight = 500;
 
 var today;
 
-var hourHand;
-var minuteHand;
-var secondHand;
+var clock;
 
 function setup() {
 	createCanvas(cWidth, cHeight);
@@ -25,47 +23,71 @@ function setup() {
 	textSize(30);
 	noStroke();
 
-	hourHand = new Hand("red", 100, 12);
-	minuteHand = new Hand("green", 125, 60);
-	secondHand = new Hand("yellow", 135, 60);
+	let hourHand = new Hand("red", 100, 12);
+	let minuteHand = new Hand("green", 125, 60);
+	let secondHand = new Hand("yellow", 135, 60);
+
+	let hands = {
+		hourHand: hourHand,
+		minuteHand: minuteHand,
+		secondHand: secondHand
+	}
+
+	clock = new Clock(cWidth/2, cHeight/2, 150, hands);
 
 }
 
 function draw() {
-	background(0);
+	background("#000033");
 
-	let xCenter = cWidth/2;
-	let yCenter = cHeight/2;
-	let clockRadius = 150;
+	clock.update();
+	clock.show();
 
-	fill("blue");
-	noStroke();
-	strokeWeight(1);
-	let i = 0;
-	for (let num of [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) {
-		let angle = i*TWO_PI/12 - HALF_PI;
-		text(num, xCenter + clockRadius*cos(angle), yCenter + clockRadius*sin(angle));
-		i += 1;
+
+}
+
+class Clock {
+	constructor(centerX, centerY, radius, hands) {
+		this.centerX = centerX;
+		this.centerY = centerY;
+		this.radius = radius;
+		this.hands = hands;
 	}
 
+	update() {
+		let today = new Date();
+		let hours = today.getHours();
+		let minutes = today.getMinutes();
+		let seconds = today.getSeconds();
 
-	today = new Date();
-	let hours = today.getHours();
-	let minutes = today.getMinutes();
-	let seconds = today.getSeconds();
+		minutes += (seconds/60);
+		hours += (minutes/60);
 
-	minutes += (seconds/60);
-	hours += (minutes/60);
+		this.hands.hourHand.value = hours;
+		this.hands.minuteHand.value = minutes;
+		this.hands.secondHand.value = seconds;
+	}
 
+	show() {
 
-	hourHand.value = hours;
-	minuteHand.value = minutes;
-	secondHand.value = seconds;
+		stroke(0);
+		fill("#330033");
+		ellipse(this.centerX, this.centerY, this.radius*2 + 50, this.radius*2 + 50)
 
-	hourHand.show();
-	minuteHand.show();
-	secondHand.show();
+		fill("#a0a050");
+		noStroke();
+		strokeWeight(1);
+		let i = 0;
+		for (let num of [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) {
+			let angle = i*TWO_PI/12 - HALF_PI;
+			text(num, this.centerX + this.radius*cos(angle), this.centerY + this.radius*sin(angle));
+			i += 1;
+		}
 
+		for (let hand in this.hands) {
+			this.hands[hand].show();
+		}
+	}
 }
 
 class Hand {
@@ -80,9 +102,7 @@ class Hand {
 		let angle = this.value / this.maxValue * TWO_PI - HALF_PI;
 		stroke(this.color);
 		strokeWeight(5);
-		let endX = cWidth/2 + this.length*cos(angle);
-		let endY = cHeight/2 + this.length*sin(angle);
-		line(cWidth/2, cHeight/2, endX, endY);
+		line(cWidth/2, cHeight/2, cWidth/2 + this.length*cos(angle), cHeight/2 + this.length*sin(angle));
 	}
 }
 
