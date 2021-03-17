@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script> <!--p5-->
+</head>
+
+<body>
+</body>
+
+<script>
+
+var cWidth = 500;
+var cHeight = 500;
+
+var today;
+
+var hourHand;
+var minuteHand;
+var secondHand;
+
+function setup() {
+	createCanvas(cWidth, cHeight);
+	textAlign(CENTER, CENTER);
+	textSize(30);
+	noStroke();
+
+	hourHand = new Hand(0, "red", 100);
+	minuteHand = new Hand(0, "green", 125);
+	secondHand = new Hand(0, "yellow", 135);
+
+}
+
+function draw() {
+	background(0);
+	today = new Date();
+	let hours = today.getHours();
+	let minutes = today.getMinutes();
+	let seconds = today.getSeconds();
+
+	let xCenter = cWidth/2;
+	let yCenter = cHeight/2;
+	let clockRadius = 150;
+
+	fill("blue");
+	noStroke();
+	strokeWeight(1);
+	for (let i = 0; i < 12; i += 1) {
+		let angle = i*TWO_PI/12 - HALF_PI;
+		text(i+1, xCenter + clockRadius*cos(angle), yCenter + clockRadius*sin(angle));
+	}
+
+	hourHand.value = hours;
+	minuteHand.value = minutes;
+	secondHand.value = seconds;
+
+	hourHand.show();
+	minuteHand.show();
+	secondHand.show();
+}
+
+class Hand {
+	constructor(value, color, length) {
+		this.value = value;
+		this.color = color;
+		this.length = length;
+	}
+
+	show() {
+		let angle = this.value / 60 * TWO_PI - HALF_PI;
+		stroke(this.color);
+		strokeWeight(5);
+		let endX = cWidth/2 + this.length*cos(angle);
+		let endY = cHeight/2 + this.length*sin(angle);
+		line(cWidth/2, cHeight/2, endX, endY);
+	}
+}
+
+
+</script>
+
+
+<style>
+
+</style>
+
+</html>
