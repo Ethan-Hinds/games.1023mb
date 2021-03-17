@@ -25,18 +25,14 @@ function setup() {
 	textSize(30);
 	noStroke();
 
-	hourHand = new Hand(0, "red", 100);
-	minuteHand = new Hand(0, "green", 125);
-	secondHand = new Hand(0, "yellow", 135);
+	hourHand = new Hand("red", 100, 12);
+	minuteHand = new Hand("green", 125, 60);
+	secondHand = new Hand("yellow", 135, 60);
 
 }
 
 function draw() {
 	background(0);
-	today = new Date();
-	let hours = today.getHours();
-	let minutes = today.getMinutes();
-	let seconds = today.getSeconds();
 
 	let xCenter = cWidth/2;
 	let yCenter = cHeight/2;
@@ -52,6 +48,16 @@ function draw() {
 		i += 1;
 	}
 
+
+	today = new Date();
+	let hours = today.getHours();
+	let minutes = today.getMinutes();
+	let seconds = today.getSeconds();
+
+	minutes += (seconds/60);
+	hours += (minutes/60);
+
+
 	hourHand.value = hours;
 	minuteHand.value = minutes;
 	secondHand.value = seconds;
@@ -59,17 +65,19 @@ function draw() {
 	hourHand.show();
 	minuteHand.show();
 	secondHand.show();
+
 }
 
 class Hand {
-	constructor(value, color, length) {
-		this.value = value;
+	constructor(color, length, maxValue) {
 		this.color = color;
 		this.length = length;
+		this.value;
+		this.maxValue = maxValue;
 	}
 
 	show() {
-		let angle = this.value / 60 * TWO_PI - HALF_PI;
+		let angle = this.value / this.maxValue * TWO_PI - HALF_PI;
 		stroke(this.color);
 		strokeWeight(5);
 		let endX = cWidth/2 + this.length*cos(angle);
