@@ -53,6 +53,17 @@ function showLegend() {
 }
 
 function keyPressed() {
+    
+    if (keyCode == 13) {
+        if (board.currentRow === board.codeRow) {
+            if (board.codeRow.colorPegs[0].color && board.codeRow.colorPegs[1].color && board.codeRow.colorPegs[2].color && board.codeRow.colorPegs[3].color) {
+                board.codeSubmitted();
+            }
+        } else {
+            board.resultPegsSubmitted();
+        }
+    }
+    
     if (keyCode == LEFT_ARROW) {
         let currentIndex = board.selected.index;
         if (currentIndex > 0) {
