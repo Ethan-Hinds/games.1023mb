@@ -51,23 +51,25 @@ function setup() {
 function draw() {
 
 	//c.clearRect(0, 0, width, height);
-	let randNumber = Math.floor(Math.random() * trianglePoints.length);
-	let triangleX = trianglePoints[randNumber].x;
-	let triangleY = trianglePoints[randNumber].y;
 
-	currentX = calculateMidX(currentX, triangleX);
-	currentY = calculateMidY(currentY, triangleY);
+	for (let i = 0; i < 50; i += 1) {
+		let randNumber = Math.floor(Math.random() * trianglePoints.length);
+		let triangleX = trianglePoints[randNumber].x;
+		let triangleY = trianglePoints[randNumber].y;
 
-	let point = new Point(currentX, currentY);
-	point.drawPoint();
+		currentX = calculateMidX(currentX, triangleX);
+		currentY = calculateMidY(currentY, triangleY);
+
+		let point = new Point(currentX, currentY);
+		point.drawPoint();
+	}
 
 };
-
 
 function Point(x,y) {
 	this.x = x;
 	this.y = y;
-	this.radius = 5;
+	this.radius = 1;
 
 	this.drawPoint = function() {
 		c.fillStyle = "blue";
