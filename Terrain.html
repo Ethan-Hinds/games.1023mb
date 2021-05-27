@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/addons/p5.sound.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  </head>
+  <body>
+  <label> Height </label> <input type = 'range' min = '-100' max = '150' value = '150' id = 'height'>
+  <br>
+   <label> Speed </label> <input type = 'range' min = '0' max = '0.2' value = '0.05' step = '0.01' id = 'speed'>
+   <br>
+      <label> Terrain Harshness </label> <input type = 'range' min = '0' max = '0.2' value = '0.1' step = '0.01' id = 'harshness'>
+      <br>
+  <script>
+var cols, rows;
+var scl = 20;
+var w = 1400;
+var h = 1400;
+
+var flying = 0;
+
+var terrain = [];
+
+function setup() {
+  createCanvas(600, 600, WEBGL);
+  cols = w / scl;
+  rows = h / scl;
+
+  for (var x = 0; x < cols; x++) {
+    terrain[x] = [];
+    for (var y = 0; y < rows; y++) {
+      terrain[x][y] = 0; //specify a default value for now
+    }
+  }
+  colorMode(HSB);
+}
+
+function draw() {
+  flying -= $("#speed").val();
+  var yoff = flying;
+  for (var y = 0; y < rows; y++) {
+    var xoff = 0;
+    for (var x = 0; x < cols; x++) {
+      terrain[x][y] = map(noise(xoff, yoff), 0, 1, -150, 150);
+      xoff += parseFloat($("#harshness").val());
+    }
+    yoff += parseFloat($("#harshness").val());
+  }
+
+  background(240, 100, 50);
+  translate(0, $("#height").val());
+  rotateX(PI / 3);
+  //noFill();
+  //fill(200, 200, 200, 50);
+  stroke(25);
+  //noStroke();
+  translate(-w / 2, -h / 2);
+  for (var y = 0; y < rows - 1; y++) {
+    beginShape(TRIANGLE_STRIP);
+    for (var x = 0; x < cols; x++) {
+    fill(92, 50, map(terrain[x][y], -100, 150, 0, 50));
+      vertex(x * scl, y * scl, terrain[x][y]);
+      vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
+    }
+    endShape();
+  }
+}
+  </script>
+  </body>
+</html>
