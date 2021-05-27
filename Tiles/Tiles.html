@@ -1,0 +1,136 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script src="https://cdn.jsdelivr.net/npm/p5@0.7.2/lib/p5.min.js"></script>
+	</head>
+
+	<body>
+	<script>
+
+	var tileBank = [];
+	var tiles = [];
+
+	class Tile {
+		constructor(width, height, rotation, isOriginal) {
+			this.x;
+			this.y;
+			this.width = width;
+			this.height = height;
+			this.rotation = rotation;
+			this.shapes = [];
+			if (isOriginal) {
+				let type = random([1, 2]);
+				if (type == 1) {
+					let x = random(this.width*0.05, this.width*0.95);
+					let y = random(this.height*0.05, this.height*0.95);
+					let width = random(this.width/4, this.width/2);
+					let height = random(this.height/4, this.height/2);
+					let rotation = random([0, 45, 90, 135, 180, 225, 270, 315]);
+					this.shapes.push(new _Rectangle(x, y, width, height, rotation, "black"));
+				} else if (type == 2) {
+					let x = random(this.width*0.05, this.width*0.95);
+					let y = random(this.height*0.05, this.height*0.95);
+					let diameter = random(this.width/4, this.width/2);
+					this.shapes.push(new _Circle(x, y, diameter, "black"));
+				}
+				this.shapes.push(new _Circle(5, 5, 30, "green"));
+				this.shapes.push(new _Circle(this.width-5, 5, 20, "green"));
+				this.shapes.push(new _Circle(5, this.height-5, 20, "green"));
+				this.shapes.push(new _Circle(this.width-5, this.height-5, 20, "green"));
+
+				this.shapes.push(new _Circle(2, this.height/2, 20, "black"));
+				this.shapes.push(new _Circle(this.width/2, 2, 20, "black"));
+				this.shapes.push(new _Circle(this.width-2, this.height/2, 20, "black"));
+				this.shapes.push(new _Circle(this.width/2, this.height-2, 20, "black"));
+			}
+		}
+		show() {
+			fill("green");
+			rect(this.x, this.y, this.width, this.height);
+			for (let shape of this.shapes) {
+				push();
+				translate(this.x, this.y);
+				//rotate(this.rotation);
+				shape.show();
+				pop();
+			}
+		}
+		copy() {
+			let newTile = new Tile(this.width, this.height, false);
+			newTile.shapes = this.shapes;
+			return newTile;
+		}
+	}
+
+	class _Circle {
+		constructor(x, y, diameter, color) {
+			this.x = x;
+			this.y = y;
+			this.diameter = diameter;
+			this.color = color;
+		}
+		show() {
+			translate(this.x, this.y);
+			fill(this.color);
+			ellipse(0, 0, this.diameter, this.diameter);
+		}
+	}
+
+	class _Rectangle {
+		constructor(x, y, width, height, rotation, color) {
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			this.rotation = rotation;
+			this.color = color;
+		}
+
+		show() {
+			translate(this.x, this.y);
+			rotate(this.rotation);
+			fill(this.color);
+			rect(0, 0, this.width, this.height);
+		}
+	}
+
+	function setup() {
+		createCanvas(700, 700);
+		angleMode(DEGREES);
+		noStroke();
+
+		let tileSize = width/10;
+		let numTiles = 5;
+		for (let i = 0; i < numTiles; i += 1) {
+			tileBank.push(new Tile(tileSize, tileSize, random([0, 45, 90, 135, 180, 225, 270, 315]), true));
+		}
+
+		for (let i = 0; i < width; i += tileSize) {
+			for (let j = 0; j < height; j += tileSize) {
+				let tileTemplate = random(tileBank);
+				let newTile = tileTemplate.copy();
+				newTile.x = i;
+				newTile.y = j;
+				tiles.push(newTile);
+			}
+		}
+	}
+
+	function draw() {
+		background(0);
+		for (let tile of tiles) {
+			tile.show();
+		}
+
+		// for (let i = 0; i < tileBank.length; i += 1) {
+		// 	let tile = tileBank[i];
+		// 	tile.x = i*tile.width*2;
+		// 	tile.y = 100;
+		// 	tile.show();
+		// }
+	}
+
+	</script>
+
+	</body>
+</html>
