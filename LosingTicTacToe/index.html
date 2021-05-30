@@ -1,0 +1,58 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script src="https://cdn.jsdelivr.net/npm/p5@0.7.2/lib/p5.min.js"></script>
+        <script language="javascript" type="text/javascript" src="sketch.js"></script>
+        <script language="javascript" type="text/javascript" src="Board.js"></script>
+	</head>
+
+	<body>
+		<div class="dropdown"><button onclick="showRules()" class="dropbtn">Instructions</button><div id="myDropdown" class="dropdown-content"><p> The goal of the game is to force your opponent to connect 3 in a row </p><p> If you can make a move that connects 3 in a row, you must make that move (and lose the game).</p></div></div>
+	</body>
+
+	<style>
+		canvas {
+			display: block;
+		}
+		.dropbtn {
+			background-color: #4CAF50;
+			color: white;
+			padding: 16px;
+			font-size: 16px;
+			border: none;
+			cursor: pointer;
+		}
+
+		.dropbtn:hover, .dropbtn:focus {
+			background-color: #3e8e41;
+		}
+
+		.dropdown {
+			position: relative;
+			display: inline-block;
+			left: 50%;
+		}
+
+		.dropdown-content {
+			display: none;
+			position: absolute;
+			background-color: #f9f9f9;
+			min-width: 160px;
+			overflow: auto;
+			box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+			z-index: 1;
+		}
+
+		.dropdown-content p {
+			color: black;
+			padding: 5px 12px;
+			text-decoration: none;
+			display: block;
+		}
+
+		.dropdown a:hover {background-color: #f1f1f1}
+
+		.show {display:block;}
+
+	</style>
+</html>
