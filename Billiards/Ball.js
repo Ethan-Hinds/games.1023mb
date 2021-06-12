@@ -30,7 +30,7 @@ class Ball {
     }
 
     checkBounce() {
-        if (this.x - table.x < this.r) {
+        if (this.x - table.x < this.r + 10) {
             if (this.justCollided.indexOf("Left") < 0) {
                 this.nextDx *= -1;
                 this.justCollided.push("Left");
@@ -41,7 +41,7 @@ class Ball {
             }
         }
         
-        if (table.x + table.width - this.x < this.r) {
+        if (table.x + table.width - this.x < this.r + 10) {
             if (this.justCollided.indexOf("Right") < 0) {
                 this.nextDx *= -1;
                 this.justCollided.push("Right");
@@ -52,7 +52,7 @@ class Ball {
             }
         }
 
-        if (this.y - table.y < this.r) {
+        if (this.y - table.y < this.r + 10) {
             if (this.justCollided.indexOf("Top") < 0) {
                 this.nextDy *= -1;
                 this.justCollided.push("Top");
@@ -63,7 +63,7 @@ class Ball {
             }
         }
         
-        if (table.y + table.height - this.y < this.r) {
+        if (table.y + table.height - this.y < this.r + 10) {
             if (this.justCollided.indexOf("Bottom") < 0) {
                 this.nextDy *= -1;
                 this.justCollided.push("Bottom");
