@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <p> Variables must be one English letter, and cannot be E or e </p>
+    <p> Variables must be one English letter.  To denote scientific notation, use *10^</p>
     <label> Expression </label>
     <input type = "text" id = "equation"> </input>
     <button onclick = "getVars()"> Ok </button>
@@ -26,9 +26,10 @@
         $("#variables").append("<br>")
         variables = {};
         let equation = document.getElementById("equation").value;
-        for (let character of equation) {
-            if (character == "E" || character == "e") {
-                alert ("You cannot use " + character + " as a variable!");
+        for (let  i = 0; i < equation.length; i += 1) {
+            let character = equation[i];
+            if ((character == "E" || character == "e") && i > 0 && !isNaN(equation[i-1])) {
+                alert ("Please use *10^ for scientific notation!");
                 $("#results").empty();
                 $("#variables").empty();
                 return;
@@ -49,9 +50,23 @@
         $("#results").append("<br>");
         for (let key in variables) {
             let val = document.getElementById(key + "Val").value;
+            for (let i = 0; i < val.length; i += 1) {
+                if (i > 0 && (val[i] == "E" || val[i] == "e") && !isNaN(val[i-1])) {
+                    alert ("Please use *10^ for scientific notation!");
+                    $("#results").empty();
+                    return;
+                }
+            }
             let uncertainty = document.getElementById(key + "Unc").value;
-            variables[key].value = val;
-            variables[key].uncertainty = uncertainty;
+            for (let i = 0; i < uncertainty.length; i += 1) {
+                if (i > 0 && (uncertainty[i] == "E" || uncertainty[i] == "e") && !isNaN(uncertainty[i-1])) {
+                    alert ("Please use *10^ for scientific notation!");
+                    $("#results").empty();
+                    return;
+                }
+            }
+            variables[key].value = math.evaluate(val);
+            variables[key].uncertainty = math.evaluate(uncertainty);
         }
 
         let equation = document.getElementById("equation").value;
