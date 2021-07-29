@@ -26,6 +26,10 @@
         variables = {};
         let equation = document.getElementById("equation").value;
         for (let character of equation) {
+            if (character == "E") {
+                alert ("You cannot use E as a variable! Try e");
+                return;
+            }
             if (isCharacterALetter(character)) {
                 if (!(character in variables)) {
                     variables[character] = {};
