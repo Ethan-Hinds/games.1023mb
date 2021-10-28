@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->
+</head>
+
+<body>
+
+</body>
+
+<table id = "board"> </table>
+<br>
+<div id = "solveButton" onclick = "start()"> <p> Solve! </p> </div>
+
+<script>
+
+let size = 9;
+
+let sqrtSize = Math.sqrt(size);
+let grid = [];
+
+let board = document.getElementById("board");
+for (let r = 0; r < size; r += 1) {
+	grid.push([]);
+	let row = document.createElement("tr");
+	row.className = "tableRow";
+	board.appendChild(row);
+	for (let c = 0; c < size; c += 1) {
+		let td = document.createElement("td");
+		td.className = "square";
+		row.appendChild(td);
+		let input = document.createElement("input");
+		td.appendChild(input);
+	}
+}
+
+let inputs = document.getElementsByTagName("input");
+for (let input of inputs) {
+	input.addEventListener("change", (event) => {
+		if (event.target.value != "") {
+			event.target.style.background = "#aaaaaa";
+		}
+	});
+}
+
+function start() {
+	for (let i = 0; i < inputs.length; i += 1) {
+		let input = inputs[i];
+		let val = input.value;
+		if (["1", "2", "3", "4", "5", "6", "7", "8", "9", ""].indexOf(val) < 0) {
+			input.value = "";
+		}
+		if (input.value == "") {
+			grid[Math.floor(i/size)].push("");
+		} else {
+			grid[Math.floor(i/size)].push(parseInt(val));
+		}
+	}
+	solve();
+}
+
+function solve() {
+	for (let r = 0; r < size; r += 1) {
+		for (let c = 0; c < size; c += 1) {
+			if (grid[r][c] == "") {
+				for (let n = 1; n <= 9; n += 1) {
+					if (canPlace(r, c, n)) {
+						grid[r][c] = n;
+						solve();
+						grid[r][c] = "";
+					}
+				}
+				return;
+			}
+		}
+	}
+	for (let r = 0; r < size; r += 1) {
+		for (let c = 0; c < size; c += 1) {
+			let i = r*size + c;
+			inputs[i].value = grid[r][c];
+		}
+	}
+}
+
+
+function canPlace(row, col, n) {
+	for (let c = 0; c < size; c += 1) {
+		if (grid[row][c] == n) {
+			return false;
+		}
+	}
+	for (let r = 0; r < size; r += 1) {
+		if (grid[r][col] == n) {
+			return false;
+		}
+	}
+	let c0 = Math.floor(col/sqrtSize)*sqrtSize;
+	let r0 = Math.floor(row/sqrtSize)*sqrtSize;
+	for (let r = 0; r < sqrtSize; r += 1) {
+		for (let c = 0; c < sqrtSize; c += 1) {
+			if (grid[r0 + r][c0 + c] == n) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+
+</script>
+
+<style>
+
+#board {
+	margin: -4px;
+	border-spacing: 0px;
+	border-collapse: separate;
+	border: 3px solid black;
+	display: inline-block;
+}
+
+.square {
+	width: 34px;
+	height: 34px;
+	border: 0.5px solid black;
+}
+
+input {
+	width: 30px;
+	height: 30px;
+	text-align: center;
+}
+
+#solveButton {
+	display: inline-block;
+	width: 100px;
+	height: 30px;
+	border-radius: 3px;
+	border: 2px solid black;
+	background-color: #00f0f0;
+	transform: translate(0px, 10px);
+}
+
+#solveButton > p {
+	line-height: 0px;
+	margin-left: 27px
+}
+
+</style>
+
+
+</html>
