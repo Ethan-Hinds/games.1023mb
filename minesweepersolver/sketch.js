@@ -193,3 +193,7 @@ function playComputerUpdate() {
         mouse.setGoal(new Box(-1, -1, false), "Go Away Mouse");
     }
 }
+
+$(document).bind("contextmenu",function(e) {
+    e.preventDefault();
+});
