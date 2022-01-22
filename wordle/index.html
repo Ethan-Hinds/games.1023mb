@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script> -->
+</head>
+
+<body>
+
+    <div id="container" class="flex-container">
+        <div id="board"> </div>
+        <div id="guessContainer">
+            <button onclick="makeGuess()"> Get Guess </button>
+            <p id="guessWord" style="visibility: hidden;"> </p>
+            <button id="notValid" style="visibility: hidden;" onclick="notValid()"> Not a valid word </button>
+            <p id="numPossible" style="font-size: 16px;"> </p>
+            <br>
+            <button class="color" style="visibility: hidden; background-color: #6aaa64;" onclick="color=`green`"> </button>
+            <button class="color" style="visibility: hidden; background-color: #c9b458;" onclick="color='yellow'"> </button>
+            <button class="color" style="visibility: hidden; background-color: #787c7e;" onclick="color='gray'"> </button>
+        </div>
+    </div>
+    <br>
+
+
+    <script>
+
+        let allWords = [];
+
+        let cols = 5;
+        let rows = 6;
+
+        let color = undefined;
+
+        let invalidWords = [];
+
+        $.ajax({
+            url: "https://raw.githubusercontent.com/dwyl/english-words/master/words.txt",
+            success: function (result) {
+                let _allWords = result.split("\n");
+                for (let i = _allWords.length - 1; i >= 0; i--) {
+                    if (_allWords[i].length == 5) {
+                        if (/^[a-zA-Z]+$/.test(_allWords[i])) {
+                            allWords.push(_allWords[i].toLowerCase());
+                        }
+                    }
+                }
+            }
+        });
+
+        $(document).ready(function() {
+            for (let i = 0; i < rows; i++) {
+                let rowName = `row${i}`;
+                $("#board").append(`<div id="${rowName}"> </div>`)
+                for (let j = 0; j < cols; j++) {
+                    $(`#${rowName}`).append(`<input type="text" id=${i},${j} class="letterInput" maxLength="1" style="background-color: rgb(255, 255, 255)"/>`)
+                }
+            }
+        });
+
+        function notValid() {
+            if (invalidWords.length == allWords.length - 1) {
+                return;
+            }
+            let guess = $("#guessWord").text().trim();
+            invalidWords.push(guess);
+
+            let newWord = guess;
+            while (invalidWords.includes(newWord)) {
+                newWord = allWords[Math.floor(Math.random()*allWords.length)];
+            }
+                $("#guessWord").html(`
+                <p> ${newWord} </p>
+                `);
+            color = undefined;
+        }
+
+        function makeGuess() {
+            invalidWords = [];
+
+            let row = getLastFullRow();
+            let word;
+            if (row == -1) {
+                word = "audio";
+            } else {
+                let result = [];
+                let inputWord = "";
+                for (let i = 0; i < cols; i++) {
+                    let element = document.getElementById(`${row},${i}`);
+                    inputWord += element.value;
+                    let backgroundColor = rgba2hex(element.style.backgroundColor);
+                    switch (backgroundColor) {
+                        case "#787c7e": result.push(0); break;
+                        case "#6aaa64": result.push(1); break;
+                        case "#c9b458": result.push(2); break;
+                        default: element.style.backgroundColor = "#787c7e"; result.push(0); break;
+                    }
+
+                    let newWords = [];
+                    for (let i = 0; i < allWords.length; i++) {
+                        let _result = compareWords(inputWord, allWords[i]);
+
+                        if (arraysEqual(result, _result)) {
+                            newWords.push(allWords[i]);
+                        }
+                    }
+                    allWords = newWords;
+
+                    if (allWords.length < 8) {
+                        word = allWords.join("\n");
+                    }
+                    word = allWords[Math.floor(Math.random()*allWords.length)];
+
+
+                }
+            }
+
+
+            $('#guessWord').css('visibility','visible');
+            $('#notValid').css('visibility','visible');
+
+            $(".color").css('visibility','visible');
+
+            $("#guessWord").html(word);
+
+            $("#numPossible").html(`${allWords.length} words possible`);
+
+            color = undefined;
+        }
+
+        // 0: gray
+        // 1: green
+        // 2: yellow
+
+        function compareWords(guess, answer) {
+            let result = [];
+            let answerWasCompared = [];
+            for (let i = 0; i < guess.length; i++) {
+                let letter = guess[i];
+                let indexIn = answer.indexOf(letter);
+                if (indexIn == -1) {
+                    result.push(0);
+                } else {
+                    if (!answerWasCompared.includes(indexIn)) {
+                        if (indexIn == i) {
+                            result.push(1);
+                        } else {
+                            result.push(2);
+                        }
+                        answerWasCompared.push(indexIn);
+                    } else {
+                        result.push(0);
+                    }
+                }
+            }   
+            return result;
+        }
+
+
+        $("body").on("click", ".letterInput", function() {
+            let row = this.id.split(',')[0];
+            if (color == "green") {
+                $(this).css("background-color", "#6aaa64");
+            } else if (color == "yellow") {
+                $(this).css("background-color", "#c9b458");
+            } else if (color == "gray") {
+                $(this).css("background-color", "#787c7e");
+            }
+        });
+
+        function getLastFullRow() {
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    if (document.getElementById(`${i},${j}`).value.length == 0) {
+                        return i-1;
+                    }
+                }
+            }
+            return rows-1;
+        }
+
+
+        const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+
+
+        function arraysEqual(a, b) {
+            if (a.length !== b.length) return false;
+            for (var i = 0; i < a.length; ++i) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
+        }
+
+   </script>
+
+</body>
+
+<style>
+
+    .letterInput {
+        width: 50px;
+        height: 50px;
+        font-size: 30px;
+        text-align: center;
+        margin: 3px;
+        border: 1px solid #aaaaaa;
+        text-transform: uppercase;
+    }
+
+    .flex-container {
+        display: flex;
+        flex-wrap: nowrap;
+        position: absolute;
+    }
+
+    #container {
+        top: 25%;
+        left: 25%;
+    }
+
+    #guessContainer {
+        margin-left: 100px;
+        font-size: 30px;
+    }
+
+    .color {
+        width: 50px;
+        height: 50px;
+        display: inline-block;
+    }
+
+</style>
+
+</html>
