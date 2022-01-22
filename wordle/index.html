@@ -33,8 +33,6 @@
 
         let color = undefined;
 
-        let invalidWords = [];
-
         $.ajax({
             url: "https://raw.githubusercontent.com/dwyl/english-words/master/words.txt",
             success: function (result) {
@@ -60,19 +58,15 @@
         });
 
         function notValid() {
-            if (invalidWords.length == allWords.length - 1) {
-                return;
-            }
-            let guess = $("#guessWord").text().trim();
-            invalidWords.push(guess);
 
-            let newWord = guess;
-            while (invalidWords.includes(newWord)) {
-                newWord = allWords[Math.floor(Math.random()*allWords.length)];
-            }
-                $("#guessWord").html(`
-                <p> ${newWord} </p>
-                `);
+            let guess = $("#guessWord").text().trim();
+
+            allWords.splice(allWords.indexOf(guess), 1);
+
+            let word = allWords[Math.floor(Math.random()*allWords.length)];
+
+            $("#guessWord").html(word);
+            $("#numPossible").html(`${allWords.length} words possible`);
             color = undefined;
         }
 
@@ -108,9 +102,10 @@
                     allWords = newWords;
 
                     if (allWords.length < 8) {
-                        word = allWords.join("\n");
+                        word = allWords.join("<br>");
+                    } else {
+                        word = allWords[Math.floor(Math.random()*allWords.length)];
                     }
-                    word = allWords[Math.floor(Math.random()*allWords.length)];
 
 
                 }
