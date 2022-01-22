@@ -23,6 +23,19 @@
     </div>
     <br>
 
+    <div class="dropdown">
+		<button onclick="showRules()" class="dropbtn">Instructions</button>
+  		<div id="myDropdown" class="dropdown-content">
+    		<p> Click "Get Guess" to see the computer's guess </p>
+    		<p> If the computer's guess is not a valid word, click "Not a valid word" to get a new guess </p>
+    		<p> Type the computer's guess into Wordle </p>
+    		<p> Type the computer's guess into the correct row in this page </p>
+    		<p> Click on the 3 colored buttons, and color each letter according to Wordle's response </p>
+    		<p> Any uncolored letters will be assumed to be gray </p>
+    		<p> Click "Get Guess" and repeat! </p>
+    	</div>
+	</div>
+
 
     <script>
 
@@ -195,6 +208,10 @@
             return true;
         }
 
+        function showRules() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
    </script>
 
 </body>
@@ -232,6 +249,47 @@
         height: 50px;
         display: inline-block;
     }
+
+
+    .dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+    background-color: #3e8e41;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    left: 80%;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content p {
+    color: black;
+    padding: 5px 12px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown a:hover {background-color: #f1f1f1}
+
+.show {display:block;}
 
 </style>
 
