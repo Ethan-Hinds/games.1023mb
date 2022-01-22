@@ -66,7 +66,7 @@
             let word = allWords[Math.floor(Math.random()*allWords.length)];
 
             $("#guessWord").html(word);
-            $("#numPossible").html(`${allWords.length} words possible`);
+            $("#numPossible").html(`${allWords.length} ${allWords.length>1?"words":"word"} possible`);
             color = undefined;
         }
 
@@ -90,25 +90,25 @@
                         case "#c9b458": result.push(2); break;
                         default: element.style.backgroundColor = "#787c7e"; result.push(0); break;
                     }
-
-                    let newWords = [];
-                    for (let i = 0; i < allWords.length; i++) {
-                        let _result = compareWords(inputWord, allWords[i]);
-
-                        if (arraysEqual(result, _result)) {
-                            newWords.push(allWords[i]);
-                        }
-                    }
-                    allWords = newWords;
-
-                    if (allWords.length < 8) {
-                        word = allWords.join("<br>");
-                    } else {
-                        word = allWords[Math.floor(Math.random()*allWords.length)];
-                    }
-
-
                 }
+
+                let newWords = [];
+                for (let i = 0; i < allWords.length; i++) {
+                    let _result = compareWords(inputWord, allWords[i]);
+
+                    if (arraysEqual(result, _result)) {
+                        newWords.push(allWords[i]);
+                    }
+                }
+                allWords = newWords;
+
+                if (allWords.length < 8) {
+                    word = allWords.join("<br>");
+                } else {
+                    word = allWords[Math.floor(Math.random()*allWords.length)];
+                }
+
+
             }
 
 
@@ -119,8 +119,7 @@
 
             $("#guessWord").html(word);
 
-            $("#numPossible").html(`${allWords.length} words possible`);
-
+            $("#numPossible").html(`${allWords.length} ${allWords.length>1?"words":"word"} possible`);
             color = undefined;
         }
 
@@ -129,26 +128,35 @@
         // 2: yellow
 
         function compareWords(guess, answer) {
-            let result = [];
+            let result = new Array(cols);
+            let guessWasCompared = [];
             let answerWasCompared = [];
             for (let i = 0; i < guess.length; i++) {
-                let letter = guess[i];
-                let indexIn = answer.indexOf(letter);
-                if (indexIn == -1) {
-                    result.push(0);
-                } else {
-                    if (!answerWasCompared.includes(indexIn)) {
-                        if (indexIn == i) {
-                            result.push(1);
-                        } else {
-                            result.push(2);
-                        }
-                        answerWasCompared.push(indexIn);
-                    } else {
-                        result.push(0);
+                if (answer.indexOf(guess[i]) == -1) {
+                    result[i] = 0;
+                } else if (guess[i] == answer[i]) {
+                    result[i] = 1;
+                    guessWasCompared.push(i);
+                    answerWasCompared.push(i);
+                }
+            }
+
+            for (let i = 0; i < guess.length; i++) {
+                for (let j = 0; j < answer.length; j++) {
+                    if (guess[i] == answer[j] && i != j && !guessWasCompared.includes(i) && !answerWasCompared.includes(j)) {
+                        result[i] = 2;
+                        guessWasCompared.push(i);
+                        answerWasCompared.push(j);
                     }
                 }
-            }   
+            }
+
+            for (let i = 0; i < result.length; i++) {
+                if (result[i] == undefined) {
+                    result[i] = 0;
+                }
+            }
+
             return result;
         }
 
