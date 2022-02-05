@@ -391,18 +391,14 @@ function Level(n) {
 
         if (keyIsDown(LEFT_ARROW)) {
             this.playerTrampoline.movePlayer(-this.trampolineSpeed);
+        } else if (mouseIsPressed && mouseX < cWidth*0.3) {
+            this.playerTrampoline.movePlayer(-this.trampolineSpeed);
         }
 
         if (keyIsDown(RIGHT_ARROW)) {
             this.playerTrampoline.movePlayer(this.trampolineSpeed);
-        }
-
-        if (mouseIsPressed) {
-            if (mouseX < cWidth*0.3) {
-                this.playerTrampoline.movePlayer(-this.trampolineSpeed);
-            } else if (mouseX > cWidth*0.7) {
-                this.playerTrampoline.movePlayer(this.trampolineSpeed);
-            }
+        } else if (mouseIsPressed && mouseX > cWidth*0.7) {
+            this.playerTrampoline.movePlayer(this.trampolineSpeed);
         }
 
         // Baby calculations and creations
