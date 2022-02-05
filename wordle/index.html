@@ -67,10 +67,24 @@
                 let rowName = `row${i}`;
                 $("#board").append(`<div id="${rowName}"> </div>`)
                 for (let j = 0; j < cols; j++) {
-                    $(`#${rowName}`).append(`<input type="text" id=${i},${j} class="letterInput" maxLength="1" style="background-color: rgb(255, 255, 255)"/>`)
+                    $(`#${rowName}`).append(`<input type="text" id=${i},${j} class="letterInput" maxLength="1" style="background-color: rgb(255, 255, 255)" oninput="inputChanged(this)"/>`)
                 }
             }
         });
+
+        function inputChanged(element) {
+            if (element.value.length > 0) {
+                let id = element.id;
+                let row = id.split(',')[0];
+                let col = parseInt(id.split(',')[1]);
+                if (col < cols - 1) {
+                    let next =  document.getElementById(`${row},${col+1}`);
+                    if (next.value.length == 0) {
+                        next.focus();
+                    }
+                }
+            }
+        }
 
         function notValid() {
 
