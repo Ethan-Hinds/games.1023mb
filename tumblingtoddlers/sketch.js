@@ -273,14 +273,14 @@ function mouseMoved() {
             if (scene.levelSelectButton.inBounds(mouseX, mouseY)) {
                 scene.levelSelectButton.isHighlighted = true;
             } else {
-                scene.levelSelectButton.isHighlighted = false
+                scene.levelSelectButton.isHighlighted = false;
             }
         }
         if (scene.statsButton) {
             if (scene.statsButton.inBounds(mouseX, mouseY)) {
                 scene.statsButton.isHighlighted = true;
             } else {
-                scene.statsButton.isHighlighted = false
+                scene.statsButton.isHighlighted = false;
             }
         }
         if (scene.creditsSceneButton) {
@@ -343,6 +343,8 @@ function mousePressed() {
             if (button.inBounds(mouseX, mouseY)) {
                 setScene(button.sceneTo);
                 break;
+            } else {
+                
             }
         }
     } else if (scene instanceof Home) {
