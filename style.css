@@ -1,0 +1,35 @@
+body {
+    background-color: #030327;
+  }
+  .iconImg {
+    width: 120px;
+    border-radius: 50%;
+  }
+  p {
+    color: #dddddd;
+  }
+  .iconDiv {
+    width: 150px;
+    height: 160px;
+    display: inline-block;
+    text-align: center;
+    padding-top: 5px;
+  }
+  .iconDiv:hover {
+    background-color: #052549;
+  }
+  .iconDiv:hover > p {
+    color: white;
+  }
+
+  .static {
+    position: absolute;
+  }
+
+  .static:hover {
+    opacity: 0;
+  }
+
+  a {
+    text-decoration: none;
+  }
